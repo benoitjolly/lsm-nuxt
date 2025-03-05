@@ -3,11 +3,11 @@
     <div class="max-w-md w-full space-y-8">
       <div>
         <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
-          Connexion
+          Créer un compte
         </h2>
       </div>
       
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
+      <form class="mt-8 space-y-6" @submit.prevent="handleRegister">
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
             <label for="email" class="sr-only">Email</label>
@@ -33,6 +33,18 @@
               placeholder="Mot de passe"
             />
           </div>
+          <div>
+            <label for="confirmPassword" class="sr-only">Confirmer le mot de passe</label>
+            <input
+              id="confirmPassword"
+              v-model="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="Confirmer le mot de passe"
+            />
+          </div>
         </div>
 
         <div v-if="error" class="text-red-500 text-sm text-center">
@@ -45,14 +57,14 @@
             :disabled="loading"
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
-            {{ loading ? 'Connexion...' : 'Se connecter' }}
+            {{ loading ? 'Création...' : 'Créer un compte' }}
           </button>
         </div>
 
         <div class="flex items-center justify-between">
           <div class="text-sm">
-            <NuxtLink to="/register" class="font-medium text-indigo-600 hover:text-indigo-500">
-              Pas encore de compte ? S'inscrire
+            <NuxtLink to="/login" class="font-medium text-indigo-600 hover:text-indigo-500">
+              Déjà un compte ? Se connecter
             </NuxtLink>
           </div>
         </div>
@@ -97,10 +109,11 @@ definePageMeta({
 
 const router = useRouter()
 const { isLoggedIn } = useAuth()
-const { signInWithEmail, signInWithGoogle, error, loading } = useFirebaseAuth()
+const { registerWithEmail, signInWithGoogle, error, loading } = useFirebaseAuth()
 
 const email = ref('')
 const password = ref('')
+const confirmPassword = ref('')
 
 // Rediriger si déjà connecté
 onMounted(() => {
@@ -109,12 +122,17 @@ onMounted(() => {
   }
 })
 
-const handleLogin = async () => {
-  if (!email.value || !password.value) {
+const handleRegister = async () => {
+  if (!email.value || !password.value || !confirmPassword.value) {
     return
   }
   
-  const success = await signInWithEmail(email.value, password.value)
+  if (password.value !== confirmPassword.value) {
+    error.value = "Les mots de passe ne correspondent pas"
+    return
+  }
+  
+  const success = await registerWithEmail(email.value, password.value)
   if (success) {
     router.push('/')
   }
