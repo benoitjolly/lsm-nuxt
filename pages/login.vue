@@ -92,7 +92,8 @@ import { useFirebaseAuth } from '~/composables/useFirebaseAuth'
 
 // Définir cette page comme publique (pas besoin de middleware)
 definePageMeta({
-  middleware: []
+  middleware: [],
+  layout: 'auth'
 })
 
 const router = useRouter()
