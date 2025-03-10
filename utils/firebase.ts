@@ -1,11 +1,15 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, type Auth } from 'firebase/auth'
+import { getFirestore, type Firestore } from 'firebase/firestore'
+import { getStorage, type FirebaseStorage } from 'firebase/storage'
 import type { FirebaseApp } from 'firebase/app'
 import { useRuntimeConfig } from '#app'
 
 // Initialisation différée de Firebase
 let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
+let db: Firestore | undefined;
+let storage: FirebaseStorage | undefined;
 
 // Fonction pour initialiser Firebase avec la configuration
 export function initializeFirebase() {
@@ -25,10 +29,12 @@ export function initializeFirebase() {
     // Initialize Firebase
     app = initializeApp(firebaseConfig)
     auth = getAuth(app)
+    db = getFirestore(app)
+    storage = getStorage(app)
   }
   
-  return { app, auth }
+  return { app, auth, db, storage }
 }
 
 // Exporter les instances pour un accès facile
-export { app, auth } 
+export { app, auth, db, storage } 

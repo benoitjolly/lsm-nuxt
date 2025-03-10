@@ -14,6 +14,13 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-03-03",
 
   modules: ['@nuxtjs/tailwindcss'],
+
+
+  routeRules: {
+    '/serrure': { swr: true },
+    '/serrure/**': { swr: true },
+
+  },
   
   // Configuration des variables d'environnement
   runtimeConfig: {
