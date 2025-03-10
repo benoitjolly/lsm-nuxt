@@ -53,7 +53,7 @@
         Détails de la Serrure: {{ serrure.codeArticle }}
       </h1>
       
-      <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div v-if="!showForm" class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
           <div>
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -91,7 +91,7 @@
             <img 
               :src="serrure.photoUrl" 
               alt="Photo de la serrure" 
-              class="h-64 w-full object-cover rounded-md"
+              class="h-64 object-cover rounded-md mx-auto"
             />
           </div>
           
@@ -154,7 +154,7 @@
           </p>
           <div class="flex justify-end space-x-3">
             <button 
-              @click="showDeleteModal = false" 
+              @click="showDeleteModal = false"
               class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
             >
               Annuler

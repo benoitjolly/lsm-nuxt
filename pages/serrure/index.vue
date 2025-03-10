@@ -62,7 +62,7 @@
             Aucune serrure trouvée. Ajoutez-en une nouvelle !
           </div>
           
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+          <div v-else class="flex flex-col space-y-4 p-6">
             <SerrureCard 
               v-for="serrure in filteredSerrures" 
               :key="serrure.id" 
