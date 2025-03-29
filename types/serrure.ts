@@ -11,4 +11,5 @@ export interface Serrure {
   pgPossible?: string;
   typeDeCame: string;
   photoUrl?: string;
+  planUrl?: string;
 } 

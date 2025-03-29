@@ -6,18 +6,19 @@ import type { Serrure } from '~/types/serrure'
 const COLLECTION_NAME = 'serrures'
 
 export const useSerrureService = () => {
-  /**
-   * Ajoute une nouvelle serrure avec une photo optionnelle
-   */
-  const addSerrure = async (serrure: Serrure, photoFile?: File): Promise<string> => {
+
+  const addSerrure = async (serrure: Serrure, photoFile?: File, planFile?: File): Promise<string> => {
     try {
-      // Ajouter d'abord le document sans l'URL de la photo
       const docRef = await addDoc(collection(db!, COLLECTION_NAME), serrure)
       
-      // Si une photo est fournie, la télécharger et mettre à jour le document
       if (photoFile) {
         const photoUrl = await uploadPhoto(docRef.id, photoFile)
         await updateDoc(docRef, { photoUrl })
+      }
+      
+      if (planFile) {
+        const planUrl = await uploadPlan(docRef.id, planFile)
+        await updateDoc(docRef, { planUrl })
       }
       
       return docRef.id
@@ -27,12 +28,10 @@ export const useSerrureService = () => {
     }
   }
 
-  /**
-   * Télécharge une photo vers Firebase Storage
-   */
+ 
   const uploadPhoto = async (serrureId: string, photoFile: File): Promise<string> => {
     try {
-      const storageRef = ref(storage!, `${COLLECTION_NAME}/${serrureId}`)
+      const storageRef = ref(storage!, `${COLLECTION_NAME}/${serrureId}/photo`)
       await uploadBytes(storageRef, photoFile)
       return await getDownloadURL(storageRef)
     } catch (error) {
@@ -41,9 +40,17 @@ export const useSerrureService = () => {
     }
   }
 
-  /**
-   * Récupère toutes les serrures
-   */
+  const uploadPlan = async (serrureId: string, planFile: File): Promise<string> => {
+    try {
+      const storageRef = ref(storage!, `${COLLECTION_NAME}/${serrureId}/plan`)
+      await uploadBytes(storageRef, planFile)
+      return await getDownloadURL(storageRef)
+    } catch (error) {
+      console.error('Erreur lors du téléchargement du plan:', error)
+      throw error
+    }
+  }
+  
   const getAllSerrures = async (): Promise<Serrure[]> => {
     try {
       const querySnapshot = await getDocs(collection(db!, COLLECTION_NAME))
@@ -57,9 +64,7 @@ export const useSerrureService = () => {
     }
   }
 
-  /**
-   * Récupère une serrure par son ID
-   */
+  
   const getSerrureById = async (id: string): Promise<Serrure | null> => {
     try {
       const docRef = doc(db!, COLLECTION_NAME, id)
@@ -76,17 +81,19 @@ export const useSerrureService = () => {
     }
   }
 
-  /**
-   * Met à jour une serrure existante
-   */
-  const updateSerrure = async (id: string, serrure: Partial<Serrure>, photoFile?: File): Promise<void> => {
+  
+  const updateSerrure = async (id: string, serrure: Partial<Serrure>, photoFile?: File, planFile?: File): Promise<void> => {
     try {
       const docRef = doc(db!, COLLECTION_NAME, id)
       
-      // Si une nouvelle photo est fournie, la télécharger
       if (photoFile) {
         const photoUrl = await uploadPhoto(id, photoFile)
         serrure.photoUrl = photoUrl
+      }
+      
+      if (planFile) {
+        const planUrl = await uploadPlan(id, planFile)
+        serrure.planUrl = planUrl
       }
       
       await updateDoc(docRef, serrure)
@@ -96,21 +103,29 @@ export const useSerrureService = () => {
     }
   }
 
-  /**
-   * Supprime une serrure et sa photo associée
-   */
+ 
   const deleteSerrure = async (id: string): Promise<void> => {
     try {
-      // Récupérer d'abord la serrure pour vérifier si elle a une photo
       const serrure = await getSerrureById(id)
       
-      // Supprimer la photo si elle existe
       if (serrure?.photoUrl) {
-        const storageRef = ref(storage!, `${COLLECTION_NAME}/${id}`)
-        await deleteObject(storageRef)
+        const photoStorageRef = ref(storage!, `${COLLECTION_NAME}/${id}/photo`)
+        try {
+          await deleteObject(photoStorageRef)
+        } catch (e) {
+          console.warn('Impossible de supprimer la photo', e)
+        }
       }
       
-      // Supprimer le document
+      if (serrure?.planUrl) {
+        const planStorageRef = ref(storage!, `${COLLECTION_NAME}/${id}/plan`)
+        try {
+          await deleteObject(planStorageRef)
+        } catch (e) {
+          console.warn('Impossible de supprimer le plan', e)
+        }
+      }
+      
       const docRef = doc(db!, COLLECTION_NAME, id)
       await deleteDoc(docRef)
     } catch (error) {
@@ -119,9 +134,7 @@ export const useSerrureService = () => {
     }
   }
 
-  /**
-   * Recherche des serrures par code article
-   */
+  
   const searchSerruresByCode = async (codeArticle: string): Promise<Serrure[]> => {
     try {
       const q = query(
@@ -147,6 +160,7 @@ export const useSerrureService = () => {
     updateSerrure,
     deleteSerrure,
     searchSerruresByCode,
-    uploadPhoto
+    uploadPhoto,
+    uploadPlan
   }
 } 

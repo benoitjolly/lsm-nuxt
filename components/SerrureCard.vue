@@ -1,7 +1,6 @@
 <template>
   <div class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="flex flex-col md:flex-row">
-      <!-- Section photo et informations principales -->
       <div class="flex items-start p-4 md:w-1/3 border-b md:border-b-0 md:border-r border-gray-200">
         <div v-if="serrure.photoUrl" class="mr-4 w-24 h-24 flex-shrink-0">
           <img 
@@ -24,7 +23,6 @@
         </div>
       </div>
       
-      <!-- Section caractéristiques techniques -->
       <div class="p-4 md:w-2/3">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>

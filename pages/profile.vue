@@ -60,7 +60,6 @@
 import { computed, onMounted } from 'vue'
 import useAuth from '~/composables/useAuth'
 
-// Définir le middleware d'authentification
 definePageMeta({
   middleware: ['auth']
 })
@@ -68,25 +67,21 @@ definePageMeta({
 const { user, logout } = useAuth()
 const router = useRouter()
 
-// Obtenir le nom d'utilisateur (ou email si pas de nom)
 const userName = computed(() => {
   if (!user.value) return 'Utilisateur'
   return user.value.displayName || user.value.email?.split('@')[0] || ''
 })
 
-// Obtenir l'email de l'utilisateur
 const userEmail = computed(() => {
   if (!user.value) return 'Non disponible'
   return user.value.email || ''
 })
 
-// Obtenir la date de dernière connexion
 const lastLoginTime = computed(() => {
   if (!user.value || !user.value.metadata.lastSignInTime) return 'Inconnue'
   return new Date(user.value.metadata.lastSignInTime).toLocaleString('fr-FR')
 })
 
-// Gérer la déconnexion
 const handleLogout = async () => {
   await logout()
   router.push('/login')

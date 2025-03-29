@@ -6,7 +6,6 @@
     
     <form @submit.prevent="submitForm" class="space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Code Article -->
         <div>
           <label for="codeArticle" class="block text-sm font-medium text-gray-700">Code Article</label>
           <input 
@@ -14,18 +13,15 @@
             id="codeArticle" 
             v-model="serrure.codeArticle" 
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
           />
         </div>
         
-        <!-- Type de Clé -->
         <div>
           <label for="typeDeCle" class="block text-sm font-medium text-gray-700">Type de Clé</label>
           <select 
             id="typeDeCle" 
             v-model="serrure.typeDeCle" 
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
           >
             <option value="">Sélectionner un type</option>
             <option value="sans clé">Sans clé</option>
@@ -34,7 +30,6 @@
           </select>
         </div>
         
-        <!-- Désignation -->
         <div>
           <label for="designation" class="block text-sm font-medium text-gray-700">Désignation</label>
           <input 
@@ -45,7 +40,6 @@
           />
         </div>
         
-        <!-- Longueur du Corps -->
         <div>
           <label for="longueurDuCorpsMm" class="block text-sm font-medium text-gray-700">Longueur du Corps (mm)</label>
           <input 
@@ -53,11 +47,9 @@
             id="longueurDuCorpsMm" 
             v-model="serrure.longueurDuCorpsMm" 
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
           />
         </div>
         
-        <!-- Course -->
         <div>
           <label for="course" class="block text-sm font-medium text-gray-700">Course</label>
           <input 
@@ -65,18 +57,15 @@
             id="course" 
             v-model="serrure.course" 
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
           />
         </div>
         
-        <!-- Sens -->
         <div>
           <label for="sens" class="block text-sm font-medium text-gray-700">Sens</label>
           <select 
             id="sens" 
             v-model="serrure.sens" 
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
           >
             <option value="">Sélectionner un sens</option>
             <option value="DouG">DouG</option>
@@ -84,7 +73,6 @@
           </select>
         </div>
         
-        <!-- Sortie de Clé -->
         <div>
           <label for="sortieDeCle" class="block text-sm font-medium text-gray-700">Sortie de Clé</label>
           <input 
@@ -95,7 +83,6 @@
           />
         </div>
         
-        <!-- Fixation Serrure -->
         <div>
           <label for="fixationSerrure" class="block text-sm font-medium text-gray-700">Fixation Serrure</label>
           <input 
@@ -106,7 +93,6 @@
           />
         </div>
         
-        <!-- PG Possible -->
         <div>
           <label for="pgPossible" class="block text-sm font-medium text-gray-700">PG Possible</label>
           <input 
@@ -117,7 +103,6 @@
           />
         </div>
         
-        <!-- Type de Came -->
         <div>
           <label for="typeDeCame" class="block text-sm font-medium text-gray-700">Type de Came</label>
           <input 
@@ -125,11 +110,9 @@
             id="typeDeCame" 
             v-model="serrure.typeDeCame" 
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
           />
         </div>
         
-        <!-- Photo -->
         <div class="col-span-1 md:col-span-2">
           <label for="photo" class="block text-sm font-medium text-gray-700">Photo</label>
           <div class="mt-1 flex items-center">
@@ -145,6 +128,27 @@
               id="photo" 
               ref="photoInput"
               @change="handlePhotoChange" 
+              accept="image/*"
+              class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            />
+          </div>
+        </div>
+        
+        <div class="col-span-1 md:col-span-2">
+          <label for="plan" class="block text-sm font-medium text-gray-700">Plan</label>
+          <div class="mt-1 flex items-center">
+            <div v-if="planPreview || serrure.planUrl" class="mr-4">
+              <img 
+                :src="planPreview || serrure.planUrl" 
+                alt="Aperçu du plan" 
+                class="h-32 w-32 object-cover rounded-md"
+              />
+            </div>
+            <input 
+              type="file" 
+              id="plan" 
+              ref="planInput"
+              @change="handlePlanChange" 
               accept="image/*"
               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
             />
@@ -182,11 +186,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'submit', serrure: Serrure, photoFile?: File): void
+  (e: 'submit', serrure: Serrure, photoFile?: File, planFile?: File): void
   (e: 'cancel'): void
 }>()
 
-// État local
 const serrure = reactive<Serrure>({
   codeArticle: '',
   typeDeCle: '',
@@ -199,35 +202,35 @@ const serrure = reactive<Serrure>({
   pgPossible: '',
   typeDeCame: '',
   photoUrl: '',
+  planUrl: '',
   ...props.initialSerrure
 })
 
 const photoInput = ref<HTMLInputElement | null>(null)
 const photoFile = ref<File | null>(null)
 const photoPreview = ref<string | null>(null)
+const planInput = ref<HTMLInputElement | null>(null)
+const planFile = ref<File | null>(null)
+const planPreview = ref<string | null>(null)
 const loading = ref(false)
 
-// Initialiser le formulaire avec les données existantes
 onMounted(() => {
   if (props.initialSerrure) {
     Object.assign(serrure, props.initialSerrure)
   }
 })
 
-// Mettre à jour le formulaire si les props changent
 watch(() => props.initialSerrure, (newVal) => {
   if (newVal) {
     Object.assign(serrure, newVal)
   }
 }, { deep: true })
 
-// Gérer le changement de photo
 const handlePhotoChange = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.files && input.files[0]) {
     photoFile.value = input.files[0]
     
-    // Créer un aperçu de l'image
     const reader = new FileReader()
     reader.onload = (e) => {
       photoPreview.value = e.target?.result as string
@@ -236,9 +239,21 @@ const handlePhotoChange = (event: Event) => {
   }
 }
 
-// Soumettre le formulaire
+const handlePlanChange = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files[0]) {
+    planFile.value = input.files[0]
+    
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      planPreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(input.files[0])
+  }
+}
+
 const submitForm = () => {
   loading.value = true
-  emit('submit', serrure as Serrure, photoFile.value || undefined)
+  emit('submit', serrure as Serrure, photoFile.value || undefined, planFile.value || undefined)
 }
 </script> 

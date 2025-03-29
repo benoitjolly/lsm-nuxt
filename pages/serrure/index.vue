@@ -52,7 +52,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Ajouter une nouvelle serrure
+              <span class="hidden sm:inline">Ajouter une nouvelle serrure</span>
             </button>
           </div>
         </div>
@@ -68,6 +68,9 @@
                 <tr>
                   <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Photo
+                  </th>
+                  <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                    Plan
                   </th>
                   <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Code Article
@@ -108,6 +111,20 @@
                     <div v-else class="p-2 bg-indigo-100 rounded-md h-10 w-10 flex items-center justify-center">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-indigo-600">
                         <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  </td>
+                  <td class="px-3 py-4 whitespace-nowrap hidden md:table-cell">
+                    <div v-if="serrure.planUrl" class="h-10 w-10">
+                      <img 
+                        :src="serrure.planUrl" 
+                        alt="Plan de la serrure" 
+                        class="h-10 w-10 object-cover rounded-md"
+                      />
+                    </div>
+                    <div v-else class="p-2 bg-gray-100 rounded-md h-10 w-10 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
                       </svg>
                     </div>
                   </td>
@@ -268,13 +285,13 @@ const cancelForm = () => {
 }
 
 // Gérer la soumission du formulaire
-const handleFormSubmit = async (serrure: Serrure, photoFile?: File) => {
+const handleFormSubmit = async (serrure: Serrure, photoFile?: File, planFile?: File) => {
   try {
     loading.value = true
     
     if (serrure.id) {
       // Mise à jour
-      await serrureService.updateSerrure(serrure.id, serrure, photoFile)
+      await serrureService.updateSerrure(serrure.id, serrure, photoFile, planFile)
       
       // Mettre à jour la liste locale
       const index = serrures.value.findIndex(s => s.id === serrure.id)
@@ -282,14 +299,12 @@ const handleFormSubmit = async (serrure: Serrure, photoFile?: File) => {
         serrures.value[index] = serrure
       }
     } else {
-      // Ajout
-      const id = await serrureService.addSerrure(serrure, photoFile)
-      
-      // Ajouter à la liste locale
-      serrures.value.push({ ...serrure, id })
+      // Création
+      const id = await serrureService.addSerrure(serrure, photoFile, planFile)
+      serrure.id = id
+      serrures.value.push(serrure)
     }
     
-    // Fermer le formulaire
     showForm.value = false
     selectedSerrure.value = undefined
   } catch (error) {

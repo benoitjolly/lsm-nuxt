@@ -102,7 +102,6 @@ import { useRouter } from 'vue-router'
 import useAuth from '~/composables/useAuth'
 import { useFirebaseAuth } from '~/composables/useFirebaseAuth'
 
-// Définir cette page comme publique (pas besoin de middleware)
 definePageMeta({
   middleware: [],
   layout: 'auth'
@@ -116,7 +115,6 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
-// Rediriger si déjà connecté
 onMounted(() => {
   if (isLoggedIn.value) {
     router.push('/')

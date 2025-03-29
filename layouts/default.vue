@@ -1,10 +1,8 @@
 <template>
   <div class="min-h-screen bg-gray-100">
-    <!-- Menu - horizontal sur mobile, vertical sur desktop -->
     <div class="bg-white shadow-md fixed rounded-xl z-10
                 sm:w-20 sm:min-h-[calc(100%-40px)] sm:my-4 sm:mx-4 sm:flex-col
                 w-full h-20 top-0 left-0 flex flex-row items-center justify-between px-4 py-2">
-      <!-- Logo -->
       <div class="sm:mb-8 sm:mt-0 mt-0">
         <NuxtLink to="/" class="block p-2 rounded-lg border border-gray-200">
           <div class="w-10 h-6 flex items-center justify-center">
@@ -13,9 +11,7 @@
         </NuxtLink>
       </div>
       
-      <!-- Navigation links - centrés horizontalement sur mobile -->
       <div class="flex sm:flex-col sm:space-y-4 flex-row space-x-4 sm:space-x-0">
-        <!-- Lien Home -->
         <NuxtLink to="/" class="p-2 rounded-lg hover:bg-gray-100 flex items-center justify-center w-9 h-9" :class="{ 'bg-gray-200': $route.path === '/' }">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-600">
             <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
@@ -23,7 +19,6 @@
           </svg>
         </NuxtLink>
         
-        <!-- Lien Serrure -->
         <NuxtLink to="/serrure" class="p-2 rounded-lg hover:bg-gray-100 flex items-center justify-center w-9 h-9" :class="{ 'bg-gray-200': $route.path === '/serrure' }">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-600">
             <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
@@ -31,7 +26,6 @@
         </NuxtLink>
       </div>
       
-      <!-- Lien Profil -->
       <div class="sm:mt-auto">
         <NuxtLink to="/profile" class="p-2 rounded-lg hover:bg-gray-100 flex items-center justify-center w-9 h-9" :class="{ 'bg-gray-200': $route.path === '/profile' }">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-600">
@@ -41,7 +35,6 @@
       </div>
     </div>
 
-    <!-- Contenu principal - ajusté pour s'adapter à la position du menu -->
     <div class="pt-24 sm:pt-0 sm:ml-24">
       <main class="py-6 px-4 sm:px-6 lg:px-8">
         <slot />

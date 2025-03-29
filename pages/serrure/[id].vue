@@ -95,6 +95,15 @@
             />
           </div>
           
+          <div v-if="serrure.planUrl" class="p-4 mt-2">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Plan de la serrure</h4>
+            <img 
+              :src="serrure.planUrl" 
+              alt="Plan de la serrure" 
+              class="h-64 object-cover rounded-md mx-auto"
+            />
+          </div>
+          
           <dl>
             <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Code Article</dt>
@@ -234,12 +243,12 @@ const cancelForm = () => {
 }
 
 // Gérer la soumission du formulaire
-const handleFormSubmit = async (updatedSerrure: Serrure, photoFile?: File) => {
+const handleFormSubmit = async (updatedSerrure: Serrure, photoFile?: File, planFile?: File) => {
   try {
     loading.value = true
     
     if (updatedSerrure.id) {
-      await serrureService.updateSerrure(updatedSerrure.id, updatedSerrure, photoFile)
+      await serrureService.updateSerrure(updatedSerrure.id, updatedSerrure, photoFile, planFile)
       serrure.value = updatedSerrure
     }
     
