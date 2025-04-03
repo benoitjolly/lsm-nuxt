@@ -55,6 +55,11 @@
               Pas encore de compte ? S'inscrire
             </NuxtLink>
           </div>
+          <div class="text-sm">
+            <NuxtLink to="/reset-password" class="font-medium text-indigo-600 hover:text-indigo-500">
+              Mot de passe oublié ?
+            </NuxtLink>
+          </div>
         </div>
 
         <div class="mt-6">
