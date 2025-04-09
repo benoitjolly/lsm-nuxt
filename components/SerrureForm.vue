@@ -17,6 +17,21 @@
         </div>
         
         <div>
+          <label for="typeSerrure" class="block text-sm font-medium text-gray-700">Type de Serrure</label>
+          <select 
+            id="typeSerrure" 
+            v-model="serrure.typeSerrureId" 
+            @change="handleTypeChange"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          >
+            <option value="">Sélectionner un type</option>
+            <option v-for="type in typesSerrure" :key="type.id" :value="type.id">
+              {{ type.nom }}
+            </option>
+          </select>
+        </div>
+        
+        <div>
           <label for="designation" class="block text-sm font-medium text-gray-700">Désignation</label>
           <input 
             type="text" 
@@ -123,6 +138,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
 import type { Serrure } from '~/types/serrure'
+import type { TypeSerrure } from '~/types/typeSerrure'
+import { useTypeSerrureService } from '~/services/typeSerrureService'
 
 const props = defineProps<{
   initialSerrure?: Partial<Serrure>
@@ -136,6 +153,8 @@ const emit = defineEmits<{
 const serrure = reactive<Serrure>({
   codeArticle: '',
   designation: '',
+  typeSerrureId: '',
+  typeSerrureNom: '',
   longueurDuCorpsMm: 0,
   fixationSerrure: '',
   typeDeCame: '',
@@ -151,10 +170,20 @@ const planInput = ref<HTMLInputElement | null>(null)
 const planFile = ref<File | null>(null)
 const planPreview = ref<string | null>(null)
 const loading = ref(false)
+const typesSerrure = ref<TypeSerrure[]>([])
 
-onMounted(() => {
+const typeSerrureService = useTypeSerrureService()
+
+onMounted(async () => {
   if (props.initialSerrure) {
     Object.assign(serrure, props.initialSerrure)
+  }
+  
+  // Charger les types de serrures
+  try {
+    typesSerrure.value = await typeSerrureService.getAllTypesSerrures()
+  } catch (err) {
+    console.error('Erreur lors du chargement des types de serrures:', err)
   }
 })
 
@@ -190,8 +219,32 @@ const handlePlanChange = (event: Event) => {
   }
 }
 
+const handleTypeChange = () => {
+  if (serrure.typeSerrureId) {
+    // Trouver le nom du type sélectionné
+    const selectedType = typesSerrure.value.find(type => type.id === serrure.typeSerrureId)
+    if (selectedType) {
+      serrure.typeSerrureNom = selectedType.nom
+    }
+  } else {
+    serrure.typeSerrureNom = ''
+  }
+}
+
 const submitForm = () => {
   loading.value = true
   emit('submit', serrure as Serrure, photoFile.value || undefined, planFile.value || undefined)
 }
+
+const updateTypesSerrure = async () => {
+  try {
+    typesSerrure.value = await typeSerrureService.getAllTypesSerrures()
+  } catch (err) {
+    console.error('Erreur lors du chargement des types de serrures:', err)
+  }
+}
+
+defineExpose({
+  updateTypesSerrure
+})
 </script> 

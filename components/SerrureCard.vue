@@ -17,6 +17,9 @@
         <div>
           <h4 class="font-medium text-gray-900">{{ serrure.codeArticle }}</h4>
           <p class="text-sm text-gray-500">{{ serrure.designation || 'Sans désignation' }}</p>
+          <span v-if="serrure.typeSerrureNom" class="mt-2 inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+            {{ serrure.typeSerrureNom }}
+          </span>
         </div>
       </div>
       

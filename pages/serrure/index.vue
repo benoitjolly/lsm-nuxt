@@ -9,10 +9,18 @@
     <div v-else>
       <!-- Formulaire d'ajout/modification -->
       <div v-if="showForm">
+        <!-- Gestion des types de serrures -->
+        <TypeSerrureForm 
+          ref="typeSerrureFormRef" 
+          class="mb-6"
+          @types-updated="handleTypesUpdated"
+        />
+      
         <SerrureForm 
           :initial-serrure="selectedSerrure" 
           @submit="handleFormSubmit" 
           @cancel="cancelForm"
+          ref="serrureFormRef"
         />
       </div>
       
@@ -93,6 +101,9 @@
                   <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
                     Type de Came
                   </th>
+                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                    Type de Serrure 
+                  </th>
                   <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -150,6 +161,9 @@
                   </td>
                   <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
                     {{ serrure.typeDeCame }}
+                  </td>
+                   <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
+                    {{ serrure.typeSerrureNom }}
                   </td>
                   <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-2">
@@ -225,6 +239,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useSerrureService } from '~/services/serrureService'
 import type { Serrure } from '~/types/serrure'
+import TypeSerrureForm from '~/components/TypeSerrureForm.vue'
 
 // Définir le middleware d'authentification
 definePageMeta({
@@ -239,6 +254,8 @@ const selectedSerrure = ref<Partial<Serrure> | undefined>(undefined)
 const searchQuery = ref('')
 const showDeleteModal = ref(false)
 const serrureToDeleteId = ref<string | undefined>(undefined)
+const typeSerrureFormRef = ref(null)
+const serrureFormRef = ref(null)
 
 // Services
 const serrureService = useSerrureService()
@@ -341,6 +358,14 @@ const deleteSerrure = async () => {
   } finally {
     loading.value = false
     serrureToDeleteId.value = undefined
+  }
+}
+
+// Gérer la mise à jour des types de serrures
+const handleTypesUpdated = () => {
+  // Mettre à jour le formulaire de serrure si disponible
+  if (serrureFormRef.value) {
+    serrureFormRef.value.updateTypesSerrure()
   }
 }
 </script> 
