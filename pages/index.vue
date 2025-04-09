@@ -30,46 +30,37 @@
         <!-- Grille de produits -->
         <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
           <div v-for="serrure in serrures" :key="serrure.id" class="group relative">
-            <div class="w-full bg-gray-100 rounded-lg overflow-hidden aspect-w-1 aspect-h-1 transition-shadow duration-300 group-hover:shadow-lg">
-              <img
-                v-if="serrure.photoUrl"
-                :src="serrure.photoUrl"
-                :alt="serrure.designation || 'Serrure'"
-                class="w-full h-full object-center object-cover"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300">
-                  <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
-                </svg>
-              </div>
-            </div>
-            
-            <div class="mt-4 flex justify-between">
-              <div>
-                <h3 class="text-sm text-gray-700 font-medium">
-                  <NuxtLink :to="`/serrure/${serrure.id}`" class="hover:text-indigo-600">
-                    {{ serrure.designation || 'Serrure' }}
-                  </NuxtLink>
-                </h3>
-                <p class="mt-1 text-sm text-gray-500">{{ serrure.codeArticle }}</p>
-                <div class="mt-2">
-                  <span v-if="serrure.typeSerrureNom" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                    {{ serrure.typeSerrureNom }}
-                  </span>
+            <NuxtLink :to="`/serrure/${serrure.id}`" class="block group cursor-pointer">
+              <div class="w-full bg-gray-100 rounded-lg overflow-hidden aspect-w-1 aspect-h-1 transition-shadow duration-300 group-hover:shadow-lg">
+                <img
+                  v-if="serrure.photoUrl"
+                  :src="serrure.photoUrl"
+                  :alt="serrure.designation || 'Serrure'"
+                  class="w-full h-full object-center object-cover"
+                />
+                <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300">
+                    <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                  </svg>
                 </div>
               </div>
               
-              <p class="text-sm font-medium text-gray-900">{{ serrure.longueurDuCorpsMm }} mm</p>
-            </div>
-            
-            <div class="mt-3 flex space-x-2">
-              <NuxtLink
-                :to="`/serrure/${serrure.id}`"
-                class="flex-1 flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150"
-              >
-                Détails
-              </NuxtLink>
-            </div>
+              <div class="mt-4 flex justify-between">
+                <div>
+                  <h3 class="text-sm text-gray-700 font-medium group-hover:text-indigo-600">
+                    {{ serrure.designation || 'Serrure' }}
+                  </h3>
+                  <p class="mt-1 text-sm text-gray-500">{{ serrure.codeArticle }}</p>
+                  <div class="mt-2">
+                    <span v-if="serrure.typeSerrureNom" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      {{ serrure.typeSerrureNom }}
+                    </span>
+                  </div>
+                </div>
+                
+                <p class="text-sm font-medium text-gray-900">{{ serrure.longueurDuCorpsMm }} mm</p>
+              </div>
+            </NuxtLink>
           </div>
         </div>
         
