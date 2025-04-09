@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  ssr: false, // Désactiver le SSR pour gérer l'authentification uniquement côté client
+  ssr: true, // Désactiver le SSR pour gérer l'authentification uniquement côté client
   css: ["~/assets/css/tailwind.css"],
 
   postcss: {
