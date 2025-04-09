@@ -157,8 +157,8 @@ const {
   googleVerification 
 } = useSeoConfig()
 
-const baseTitle = `Serrures de haute qualité - Catalogue de serrures professionnelles | ${siteName}`
-const baseDescription = 'Découvrez notre gamme complète de serrures professionnelles pour toutes applications. Sécurité, fiabilité et innovation garanties pour vos besoins résidentiels et industriels.'
+const baseTitle = `Serrures Professionnelles de Haute Qualité | Sécurité & Fiabilité | ${siteName}`
+const baseDescription = 'Catalogue complet de serrures professionnelles pour applications résidentielles et industrielles. Découvrez nos serrures de haute qualité, fiables et sécurisées. Livraison rapide et service client expert.'
 
 // Regrouper les serrures par type
 const typeSerrures = computed(() => {
@@ -291,7 +291,7 @@ useHead({
   },
   meta: [
     { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
-    { name: 'keywords', content: `serrures, serrures professionnelles, sécurité, serrures industrielles, serrures résidentielles, ${types.value.map(type => type.nom).join(', ')}` },
+    { name: 'keywords', content: `serrures professionnelles, serrures haute qualité, serrures sécurisées, serrures industrielles, serrures résidentielles, ${types.value.map(type => type.nom).join(', ')}` },
     { name: 'author', content: siteName },
     { property: 'og:locale', content: 'fr_FR' },
     { name: 'twitter:creator', content: twitterHandle },
@@ -301,7 +301,8 @@ useHead({
   link: [
     { rel: 'canonical', href: siteUrl },
     { rel: 'alternate', href: siteUrl, hreflang: 'x-default' },
-    { rel: 'alternate', href: siteUrl, hreflang: 'fr' }
+    { rel: 'alternate', href: siteUrl, hreflang: 'fr' },
+    { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
   ],
   script: [
     {

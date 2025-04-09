@@ -43,14 +43,18 @@ export default defineNuxtConfig({
   
   app: {
     head: {
-      title: 'LSM App',
+      title: 'Serrures Professionnelles | LSM App',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: 'LSM Application' }
+        { hid: 'description', name: 'description', content: 'Catalogue de serrures professionnelles de haute qualité. Sécurité et fiabilité garanties pour vos installations résidentielles et industrielles.' },
+        { name: 'format-detection', content: 'telephone=no' },
+        { name: 'theme-color', content: '#4f46e5' },
+        { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' }
       ],
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon.ico' }
       ]
     }
   }

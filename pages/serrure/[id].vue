@@ -249,22 +249,60 @@ const mainImage = computed(() => serrure.value?.photoUrl || defaultProductImage)
 
 // Générer les données structurées pour Schema.org
 const generateStructuredData = () => {
-  if (!serrure.value || !typeSerrure.value) return {}
+  if (!serrure.value) return {}
+
+  // Propriétés additionnelles pour Schema.org
+  const additionalProperties = []
+  
+  if (serrure.value.longueurDuCorpsMm) {
+    additionalProperties.push({
+      "@type": "PropertyValue",
+      "name": "Longueur du Corps",
+      "value": `${serrure.value.longueurDuCorpsMm} mm`
+    })
+  }
+  
+  if (serrure.value.fixationSerrure) {
+    additionalProperties.push({
+      "@type": "PropertyValue",
+      "name": "Fixation",
+      "value": serrure.value.fixationSerrure
+    })
+  }
+  
+  if (serrure.value.typeDeCame) {
+    additionalProperties.push({
+      "@type": "PropertyValue",
+      "name": "Type de Came",
+      "value": serrure.value.typeDeCame
+    })
+  }
+  
+  if (serrure.value.typeDeCle) {
+    additionalProperties.push({
+      "@type": "PropertyValue",
+      "name": "Type de Clé",
+      "value": serrure.value.typeDeCle
+    })
+  }
 
   // Créer le schéma Product
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": serrure.value.designation || `Serrure ${serrure.value.codeArticle}`,
-    "description": serrure.value.typeSerrureNom ? `Serrure professionnelle de type ${serrure.value.typeSerrureNom}, code article: ${serrure.value.codeArticle}` : `Serrure professionnelle, code article: ${serrure.value.codeArticle}`,
-    "image": mainImage.value,
+    "description": serrure.value.typeSerrureNom 
+      ? `Serrure professionnelle de type ${serrure.value.typeSerrureNom}, code article: ${serrure.value.codeArticle}. Sécurité et fiabilité garanties pour vos installations.` 
+      : `Serrure professionnelle de haute qualité, code article: ${serrure.value.codeArticle}. Solution de sécurité fiable et durable.`,
+    "image": serrure.value.photoUrl || defaultProductImage,
+    "sku": serrure.value.codeArticle,
     "brand": {
       "@type": "Brand",
       "name": siteName
     },
-    "category": typeSerrure.value.nom,
-    "sku": serrure.value.codeArticle,
-    "url": `${siteUrl}/serrure/${serrure.value.id}`
+    "category": serrure.value.typeSerrureNom || "Serrure professionnelle",
+    "url": `${siteUrl}/serrure/${serrure.value.id}`,
+    "additionalProperty": additionalProperties
   }
 
   // Créer le schéma BreadcrumbList pour le fil d'Ariane
@@ -281,8 +319,8 @@ const generateStructuredData = () => {
       {
         "@type": "ListItem",
         "position": 2,
-        "name": typeSerrure.value.nom,
-        "item": `${siteUrl}/type/${typeSerrure.value.id}`
+        "name": serrure.value.typeSerrureNom || "Serrures",
+        "item": serrure.value.typeSerrureId ? `${siteUrl}/type/${serrure.value.typeSerrureId}` : `${siteUrl}/serrures`
       },
       {
         "@type": "ListItem",
@@ -324,31 +362,45 @@ onMounted(async () => {
     if (serrure.value) {
       // Titre et description dynamiques pour SEO
       const productName = serrure.value.designation || `Serrure ${serrure.value.codeArticle}`
-      const title = `${productName} - ${typeSerrure.value?.nom || 'Serrure professionnelle'} | ${siteName}`
+      const productType = serrure.value.typeSerrureNom || 'Professionnelle'
+      const title = `${productName} | Serrure ${productType} de Haute Qualité | ${siteName}`
       
-      // Description SEO enrichie avec caractéristiques du produit
-      let description = ''
-      description += `${productName} - Code article: ${serrure.value.codeArticle}`
-      if (serrure.value.typeDeCle) {
-        description += `, Type de clé: ${serrure.value.typeDeCle}`
+      // Description SEO enrichie avec caractéristiques du produit et mots-clés
+      let description = `${productName} - Serrure professionnelle de haute qualité (Code: ${serrure.value.codeArticle})`
+      if (serrure.value.longueurDuCorpsMm) {
+        description += `, Longueur: ${serrure.value.longueurDuCorpsMm} mm`
       }
-      description += `. Découvrez cette serrure professionnelle de haute qualité.`
+      if (serrure.value.typeSerrureNom) {
+        description += `, Type: ${serrure.value.typeSerrureNom}`
+      }
+      if (serrure.value.typeDeCle) {
+        description += `, Clé: ${serrure.value.typeDeCle}`
+      }
+      if (serrure.value.fixationSerrure) {
+        description += `, Fixation: ${serrure.value.fixationSerrure}`
+      }
+      description += `. Solution de sécurité fiable et durable pour vos installations.`
       
       // Mots-clés dynamiques basés sur les attributs du produit
       let keywordsArray = [
-        'serrure', 
         'serrure professionnelle', 
+        'serrure haute qualité',
+        'serrure sécurisée',
         serrure.value.codeArticle,
         productName
       ]
       
-      if (typeSerrure.value?.nom) {
-        keywordsArray.push(typeSerrure.value.nom)
-        keywordsArray.push(`serrure ${typeSerrure.value.nom}`)
+      if (serrure.value.typeSerrureNom) {
+        keywordsArray.push(serrure.value.typeSerrureNom)
+        keywordsArray.push(`serrure ${serrure.value.typeSerrureNom}`)
       }
       
       if (serrure.value.typeDeCle) {
         keywordsArray.push(serrure.value.typeDeCle)
+      }
+      
+      if (serrure.value.fixationSerrure) {
+        keywordsArray.push(`serrure ${serrure.value.fixationSerrure}`)
       }
       
       const keywords = keywordsArray.join(', ')
