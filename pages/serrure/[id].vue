@@ -182,14 +182,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSerrureService } from '~/services/serrureService'
 import type { Serrure } from '~/types/serrure'
+import { useHead } from 'unhead'
 
-// Définir le middleware d'authentification
+// Modifier la définition du middleware pour rendre cette page accessible sans connexion
 definePageMeta({
-  middleware: ['auth']
+  middleware: [],
+  layout: 'default'
 })
 
 // État
@@ -284,4 +286,15 @@ const deleteSerrure = async () => {
     loading.value = false
   }
 }
+
+// Ajouter les métadonnées SEO de base
+useHead({
+  title: 'Détails de la serrure',
+  meta: [
+    { name: 'description', content: 'Découvrez les détails techniques et caractéristiques de cette serrure de haute qualité.' },
+    { property: 'og:title', content: 'Détails de la serrure' },
+    { property: 'og:description', content: 'Découvrez les détails techniques et caractéristiques de cette serrure de haute qualité.' },
+    { property: 'og:type', content: 'product' }
+  ]
+})
 </script> 

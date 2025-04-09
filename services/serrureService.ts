@@ -1,4 +1,4 @@
-import { db, storage } from '~/utils/firebase'
+import { initializeFirebase } from '~/utils/firebase'
 import { collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 import type { Serrure } from '~/types/serrure'
@@ -6,10 +6,18 @@ import type { Serrure } from '~/types/serrure'
 const COLLECTION_NAME = 'serrures'
 
 export const useSerrureService = () => {
+  // Initialiser Firebase directement dans le service
+  const { db, storage } = initializeFirebase()
+  
+  if (!db || !storage) {
+    console.error('Firebase n\'est pas correctement initialisé')
+  }
 
   const addSerrure = async (serrure: Serrure, photoFile?: File, planFile?: File): Promise<string> => {
     try {
-      const docRef = await addDoc(collection(db!, COLLECTION_NAME), serrure)
+      if (!db) throw new Error('Firebase n\'est pas initialisé')
+      
+      const docRef = await addDoc(collection(db, COLLECTION_NAME), serrure)
       
       if (photoFile) {
         const photoUrl = await uploadPhoto(docRef.id, photoFile)
@@ -31,7 +39,9 @@ export const useSerrureService = () => {
  
   const uploadPhoto = async (serrureId: string, photoFile: File): Promise<string> => {
     try {
-      const storageRef = ref(storage!, `${COLLECTION_NAME}/${serrureId}/photo`)
+      if (!storage) throw new Error('Firebase Storage n\'est pas initialisé')
+      
+      const storageRef = ref(storage, `${COLLECTION_NAME}/${serrureId}/photo`)
       await uploadBytes(storageRef, photoFile)
       return await getDownloadURL(storageRef)
     } catch (error) {
@@ -42,7 +52,9 @@ export const useSerrureService = () => {
 
   const uploadPlan = async (serrureId: string, planFile: File): Promise<string> => {
     try {
-      const storageRef = ref(storage!, `${COLLECTION_NAME}/${serrureId}/plan`)
+      if (!storage) throw new Error('Firebase Storage n\'est pas initialisé')
+      
+      const storageRef = ref(storage, `${COLLECTION_NAME}/${serrureId}/plan`)
       await uploadBytes(storageRef, planFile)
       return await getDownloadURL(storageRef)
     } catch (error) {
@@ -53,7 +65,9 @@ export const useSerrureService = () => {
   
   const getAllSerrures = async (): Promise<Serrure[]> => {
     try {
-      const querySnapshot = await getDocs(collection(db!, COLLECTION_NAME))
+      if (!db) throw new Error('Firebase n\'est pas initialisé')
+      
+      const querySnapshot = await getDocs(collection(db, COLLECTION_NAME))
       return querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -67,7 +81,9 @@ export const useSerrureService = () => {
   
   const getSerrureById = async (id: string): Promise<Serrure | null> => {
     try {
-      const docRef = doc(db!, COLLECTION_NAME, id)
+      if (!db) throw new Error('Firebase n\'est pas initialisé')
+      
+      const docRef = doc(db, COLLECTION_NAME, id)
       const docSnap = await getDoc(docRef)
       
       if (docSnap.exists()) {
@@ -84,7 +100,9 @@ export const useSerrureService = () => {
   
   const updateSerrure = async (id: string, serrure: Partial<Serrure>, photoFile?: File, planFile?: File): Promise<void> => {
     try {
-      const docRef = doc(db!, COLLECTION_NAME, id)
+      if (!db) throw new Error('Firebase n\'est pas initialisé')
+      
+      const docRef = doc(db, COLLECTION_NAME, id)
       
       if (photoFile) {
         const photoUrl = await uploadPhoto(id, photoFile)
@@ -106,10 +124,12 @@ export const useSerrureService = () => {
  
   const deleteSerrure = async (id: string): Promise<void> => {
     try {
+      if (!db || !storage) throw new Error('Firebase n\'est pas initialisé')
+      
       const serrure = await getSerrureById(id)
       
       if (serrure?.photoUrl) {
-        const photoStorageRef = ref(storage!, `${COLLECTION_NAME}/${id}/photo`)
+        const photoStorageRef = ref(storage, `${COLLECTION_NAME}/${id}/photo`)
         try {
           await deleteObject(photoStorageRef)
         } catch (e) {
@@ -118,7 +138,7 @@ export const useSerrureService = () => {
       }
       
       if (serrure?.planUrl) {
-        const planStorageRef = ref(storage!, `${COLLECTION_NAME}/${id}/plan`)
+        const planStorageRef = ref(storage, `${COLLECTION_NAME}/${id}/plan`)
         try {
           await deleteObject(planStorageRef)
         } catch (e) {
@@ -126,7 +146,7 @@ export const useSerrureService = () => {
         }
       }
       
-      const docRef = doc(db!, COLLECTION_NAME, id)
+      const docRef = doc(db, COLLECTION_NAME, id)
       await deleteDoc(docRef)
     } catch (error) {
       console.error('Erreur lors de la suppression de la serrure:', error)
@@ -137,8 +157,10 @@ export const useSerrureService = () => {
   
   const searchSerruresByCode = async (codeArticle: string): Promise<Serrure[]> => {
     try {
+      if (!db) throw new Error('Firebase n\'est pas initialisé')
+      
       const q = query(
-        collection(db!, COLLECTION_NAME), 
+        collection(db, COLLECTION_NAME), 
         where('codeArticle', '==', codeArticle)
       )
       
