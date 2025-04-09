@@ -50,7 +50,8 @@ export default defineNuxtConfig({
         { hid: 'description', name: 'description', content: 'Catalogue de serrures professionnelles de haute qualité. Sécurité et fiabilité garanties pour vos installations résidentielles et industrielles.' },
         { name: 'format-detection', content: 'telephone=no' },
         { name: 'theme-color', content: '#4f46e5' },
-        { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' }
+        { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+        { name: 'google-site-verification', content: 'tjZAYOIiBuffKzJW4abjGOWdi9RxNmAFqAs7lR4Ig_s' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
