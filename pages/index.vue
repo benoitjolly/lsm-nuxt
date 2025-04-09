@@ -1,9 +1,23 @@
 <template>
   <div class="bg-white">
     <div class="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-      <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl mb-8">
-        Serrures de haute qualité
-      </h1>
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          Serrures de haute qualité
+        </h1>
+        
+        <div v-if="isLoggedIn">
+          <NuxtLink to="/serrure" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
+            Administration
+          </NuxtLink>
+        </div>
+        <div v-else>
+          <NuxtLink to="/login" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-150">
+            Connexion
+          </NuxtLink>
+        </div>
+      </div>
+      
       <p class="text-lg text-gray-500 max-w-3xl mb-12">
         Découvrez notre gamme complète de serrures professionnelles. Sécurité, fiabilité et innovation au service de vos besoins.
       </p>
@@ -72,6 +86,7 @@
 import { ref, onMounted } from 'vue'
 import type { Serrure } from '~/types/serrure'
 import { useSerrureService } from '~/services/serrureService'
+import useAuth from '~/composables/useAuth'
 
 // Définir cette page comme publique (pas besoin de middleware)
 definePageMeta({
@@ -82,6 +97,7 @@ definePageMeta({
 const serrures = ref<Serrure[]>([])
 const loading = ref(true)
 const serrureService = useSerrureService()
+const { isLoggedIn } = useAuth()
 
 // Charger les serrures au montage du composant
 onMounted(async () => {
