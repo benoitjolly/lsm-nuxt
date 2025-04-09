@@ -24,7 +24,13 @@ export default defineNuxtConfig({
   
   // Configuration des variables d'environnement
   runtimeConfig: {
+    apiSecret: process.env.NUXT_API_SECRET || '',
     public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://votredomaine.com',
+      siteName: process.env.NUXT_PUBLIC_SITE_NAME || 'Serrures Professionnelles',
+      twitterHandle: process.env.NUXT_PUBLIC_TWITTER_HANDLE || '@votre_compte_twitter',
+      googleVerification: process.env.NUXT_PUBLIC_GOOGLE_VERIFICATION || '',
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
       FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
       FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
       FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,

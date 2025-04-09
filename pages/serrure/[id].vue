@@ -4,8 +4,9 @@
       <NuxtLink 
         :to="isLoggedIn ? '/serrure' : '/'" 
         class="inline-flex items-center text-indigo-600 hover:text-indigo-900"
+        aria-label="Retour à la liste des serrures"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         {{ isLoggedIn ? 'Retour à la liste' : 'Retour à l\'accueil' }}
@@ -19,7 +20,7 @@
     <div v-else-if="error" class="bg-red-50 p-4 rounded-md">
       <div class="flex">
         <div class="flex-shrink-0">
-          <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
           </svg>
         </div>
@@ -35,7 +36,7 @@
     <div v-else-if="!serrure" class="bg-yellow-50 p-4 rounded-md">
       <div class="flex">
         <div class="flex-shrink-0">
-          <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
           </svg>
         </div>
@@ -50,17 +51,20 @@
     
     <div v-else>
       <h1 class="text-2xl font-bold text-gray-900 mb-6">
-        Détails de la Serrure: {{ serrure.codeArticle }}
+        {{ serrure.designation || 'Serrure' }} - Code {{ serrure.codeArticle }}
       </h1>
       
       <div v-if="!showForm" class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
           <div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
+            <h2 class="text-lg leading-6 font-medium text-gray-900">
               {{ serrure.designation || 'Sans désignation' }}
-            </h3>
+            </h2>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">
-              Type de clé: {{ serrure.typeDeCle }}
+              <span v-if="serrure.typeSerrureNom" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 mr-2">
+                {{ serrure.typeSerrureNom }}
+              </span>
+              <span v-if="serrure.typeDeCle">Type de clé: {{ serrure.typeDeCle }}</span>
             </p>
           </div>
           
@@ -69,8 +73,9 @@
               v-if="isLoggedIn"
               @click="editSerrure" 
               class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              aria-label="Modifier cette serrure"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
               Modifier
@@ -79,8 +84,9 @@
               v-if="isLoggedIn"
               @click="confirmDeleteSerrure" 
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              aria-label="Supprimer cette serrure"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
               Supprimer
@@ -92,8 +98,10 @@
           <div v-if="serrure.photoUrl" class="p-4">
             <img 
               :src="serrure.photoUrl" 
-              alt="Photo de la serrure" 
+              :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle}`" 
               class="h-64 object-cover rounded-md mx-auto"
+              loading="lazy"
+              itemprop="image"
             />
           </div>
           
@@ -101,45 +109,55 @@
             <h4 class="text-sm font-medium text-gray-700 mb-2">Plan de la serrure</h4>
             <img 
               :src="serrure.planUrl" 
-              alt="Plan de la serrure" 
+              :alt="`Plan technique de la serrure ${serrure.designation || serrure.codeArticle}`" 
               class="h-64 object-cover rounded-md mx-auto"
+              loading="lazy"
             />
           </div>
           
-          <dl>
+          <dl class="divide-y divide-gray-200">
             <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Code Article</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.codeArticle }}</dd>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2" itemprop="sku">{{ serrure.codeArticle }}</dd>
             </div>
-            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div v-if="serrure.typeSerrureNom" class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Type de Serrure</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2" itemprop="category">{{ serrure.typeSerrureNom }}</dd>
+            </div>
+            <div v-if="serrure.typeDeCle" class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Type de Clé</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.typeDeCle }}</dd>
             </div>
-            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt class="text-sm font-medium text-gray-500">Longueur du Corps</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.longueurDuCorpsMm }} mm</dd>
-            </div>
             <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Longueur du Corps</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <span itemprop="additionalProperty" itemscope itemtype="https://schema.org/PropertyValue">
+                  <meta itemprop="name" content="Longueur du Corps" />
+                  <span itemprop="value">{{ serrure.longueurDuCorpsMm }}</span> mm
+                </span>
+              </dd>
+            </div>
+            <div v-if="serrure.course" class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Course</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.course }}</dd>
             </div>
-            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div v-if="serrure.sens" class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Sens</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.sens }}</dd>
             </div>
-            <div v-if="serrure.sortieDeCle" class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div v-if="serrure.sortieDeCle" class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Sortie de Clé</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.sortieDeCle }}</dd>
             </div>
-            <div v-if="serrure.fixationSerrure" class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div v-if="serrure.fixationSerrure" class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Fixation Serrure</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.fixationSerrure }}</dd>
             </div>
-            <div v-if="serrure.pgPossible" class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div v-if="serrure.pgPossible" class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">PG Possible</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.pgPossible }}</dd>
             </div>
-            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div v-if="serrure.typeDeCame" class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Type de Came</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ serrure.typeDeCame }}</dd>
             </div>
@@ -171,7 +189,7 @@
               Annuler
             </button>
             <button 
-              @click="deleteSerrure" 
+              @click="confirmDelete" 
               class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
             >
               Supprimer
@@ -184,54 +202,205 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useSerrureService } from '~/services/serrureService'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useSeoMeta, useHead } from 'unhead'
 import type { Serrure } from '~/types/serrure'
-import { useHead } from 'unhead'
+import type { TypeSerrure } from '~/types/typeSerrure'
+import { useSerrureService } from '~/services/serrureService'
+import { useTypeSerrureService } from '~/services/typeSerrureService'
 import useAuth from '~/composables/useAuth'
+import { useSeoConfig } from '~/composables/useSeoConfig'
 
-// Modifier la définition du middleware pour rendre cette page accessible sans connexion
+// Définir cette page comme publique (pas besoin de middleware)
 definePageMeta({
   middleware: [],
   layout: 'default'
 })
 
-// État
+const route = useRoute()
+const router = useRouter()
 const serrure = ref<Serrure | null>(null)
+const typeSerrure = ref<TypeSerrure | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const showForm = ref(false)
 const showDeleteModal = ref(false)
-
-// Services et utilitaires
 const serrureService = useSerrureService()
-const router = useRouter()
-const route = useRoute()
+const { getSerrureById } = useSerrureService()
+const { getTypeSerrureById } = useTypeSerrureService()
+const { isLoggedIn } = useAuth()
 
-// Récupérer l'ID de la serrure depuis l'URL
-const serrureId = route.params.id as string
+// Configuration SEO
+const { 
+  siteUrl, 
+  siteName, 
+  defaultProductImage,
+  formatAuthor,
+  getOgType,
+  defaultLocale
+} = useSeoConfig()
 
-// Charger les détails de la serrure
+// ID de la serrure depuis l'URL
+const serrureId = computed(() => route.params.id as string)
+
+// Image principale pour SEO
+const mainImage = computed(() => serrure.value?.photoUrl || defaultProductImage)
+
+// Générer les données structurées pour Schema.org
+const generateStructuredData = () => {
+  if (!serrure.value || !typeSerrure.value) return {}
+
+  // Créer le schéma Product
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": serrure.value.designation || `Serrure ${serrure.value.codeArticle}`,
+    "description": serrure.value.typeSerrureNom ? `Serrure professionnelle de type ${serrure.value.typeSerrureNom}, code article: ${serrure.value.codeArticle}` : `Serrure professionnelle, code article: ${serrure.value.codeArticle}`,
+    "image": mainImage.value,
+    "brand": {
+      "@type": "Brand",
+      "name": siteName
+    },
+    "category": typeSerrure.value.nom,
+    "sku": serrure.value.codeArticle,
+    "url": `${siteUrl}/serrure/${serrure.value.id}`
+  }
+
+  // Créer le schéma BreadcrumbList pour le fil d'Ariane
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": siteUrl
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": typeSerrure.value.nom,
+        "item": `${siteUrl}/type/${typeSerrure.value.id}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": serrure.value.designation || serrure.value.codeArticle,
+        "item": `${siteUrl}/serrure/${serrure.value.id}`
+      }
+    ]
+  }
+
+  return [productSchema, breadcrumbSchema]
+}
+
+// Fonction pour supprimer une serrure
+const handleDelete = async () => {
+  if (!serrure.value?.id) return
+  
+  if (confirm('Êtes-vous sûr de vouloir supprimer cette serrure ?')) {
+    try {
+      await serrureService.deleteSerrure(serrure.value.id)
+      router.push('/')
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la serrure:', error)
+    }
+  }
+}
+
+// Charger les données
 onMounted(async () => {
   try {
-    if (!serrureId) {
-      error.value = 'ID de serrure non spécifié'
-      return
-    }
-    console.log('ID de la serrure récupéré:', serrureId)
+    loading.value = true
+    const serrureData = await getSerrureById(serrureId.value)
+    serrure.value = serrureData
     
-    const result = await serrureService.getSerrureById(serrureId)
-    
-    if (!result) {
-      error.value = 'Serrure introuvable'
-      return
+    if (serrure.value?.typeSerrureId) {
+      typeSerrure.value = await getTypeSerrureById(serrure.value.typeSerrureId)
     }
     
-    serrure.value = result
-  } catch (err) {
-    console.error('Erreur lors du chargement de la serrure:', err)
-    error.value = 'Erreur lors du chargement des données'
+    if (serrure.value) {
+      // Titre et description dynamiques pour SEO
+      const productName = serrure.value.designation || `Serrure ${serrure.value.codeArticle}`
+      const title = `${productName} - ${typeSerrure.value?.nom || 'Serrure professionnelle'} | ${siteName}`
+      
+      // Description SEO enrichie avec caractéristiques du produit
+      let description = ''
+      description += `${productName} - Code article: ${serrure.value.codeArticle}`
+      if (serrure.value.typeDeCle) {
+        description += `, Type de clé: ${serrure.value.typeDeCle}`
+      }
+      description += `. Découvrez cette serrure professionnelle de haute qualité.`
+      
+      // Mots-clés dynamiques basés sur les attributs du produit
+      let keywordsArray = [
+        'serrure', 
+        'serrure professionnelle', 
+        serrure.value.codeArticle,
+        productName
+      ]
+      
+      if (typeSerrure.value?.nom) {
+        keywordsArray.push(typeSerrure.value.nom)
+        keywordsArray.push(`serrure ${typeSerrure.value.nom}`)
+      }
+      
+      if (serrure.value.typeDeCle) {
+        keywordsArray.push(serrure.value.typeDeCle)
+      }
+      
+      const keywords = keywordsArray.join(', ')
+      
+      // Configuration SEO optimisée
+      useSeoMeta({
+        title: title,
+        ogTitle: title,
+        description: description,
+        ogDescription: description,
+        ogImage: mainImage.value,
+        twitterCard: 'summary_large_image',
+        ogType: getOgType('product'),
+        ogUrl: `${siteUrl}/serrure/${serrureId.value}`,
+        ogSiteName: siteName,
+        twitterTitle: title,
+        twitterDescription: description,
+        twitterImage: mainImage.value,
+        articleAuthor: formatAuthor(siteName),
+        articlePublishedTime: new Date().toISOString(),
+        articleModifiedTime: new Date().toISOString(),
+      })
+      
+      // Configuration avancée avec données structurées
+      useHead({
+        title: title,
+        htmlAttrs: {
+          lang: 'fr'
+        },
+        meta: [
+          { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+          { name: 'keywords', content: keywords },
+          { name: 'author', content: siteName },
+          { property: 'og:locale', content: defaultLocale },
+          { name: 'googlebot', content: 'index, follow' }
+        ],
+        link: [
+          { rel: 'canonical', href: `${siteUrl}/serrure/${serrureId.value}` },
+          { rel: 'alternate', href: `${siteUrl}/serrure/${serrureId.value}`, hreflang: 'x-default' },
+          { rel: 'alternate', href: `${siteUrl}/serrure/${serrureId.value}`, hreflang: 'fr' }
+        ],
+        script: [
+          {
+            type: 'application/ld+json',
+            innerHTML: JSON.stringify(generateStructuredData())
+          }
+        ]
+      })
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des données:', error)
+    serrure.value = null
   } finally {
     loading.value = false
   }
@@ -272,7 +441,7 @@ const confirmDeleteSerrure = () => {
 }
 
 // Supprimer la serrure
-const deleteSerrure = async () => {
+const confirmDelete = async () => {
   if (!serrure.value?.id) return
   
   try {
@@ -281,26 +450,16 @@ const deleteSerrure = async () => {
     
     await serrureService.deleteSerrure(serrure.value.id)
     
-    // Rediriger vers la liste des serrures
-    router.push('/serrure')
+    // Rediriger vers la liste des serrures si connecté, sinon vers l'accueil
+    if (isLoggedIn) {
+      router.push('/serrure')
+    } else {
+      router.push('/')
+    }
   } catch (err) {
     console.error('Erreur lors de la suppression de la serrure:', err)
     error.value = 'Erreur lors de la suppression'
     loading.value = false
   }
 }
-
-// Ajouter les métadonnées SEO de base
-useHead({
-  title: 'Détails de la serrure',
-  meta: [
-    { name: 'description', content: 'Découvrez les détails techniques et caractéristiques de cette serrure de haute qualité.' },
-    { property: 'og:title', content: 'Détails de la serrure' },
-    { property: 'og:description', content: 'Découvrez les détails techniques et caractéristiques de cette serrure de haute qualité.' },
-    { property: 'og:type', content: 'product' }
-  ]
-})
-
-// Ajouter dans le script setup
-const { isLoggedIn } = useAuth()
 </script> 

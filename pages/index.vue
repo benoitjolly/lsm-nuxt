@@ -31,9 +31,9 @@
         <div v-for="(type, index) in typesAvecSerrures" :key="type.id" class="mb-12 last:mb-0">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-900">{{ type.nom }}</h2>
-            <NuxtLink :to="`/type/${type.id}`" class="text-indigo-600 hover:text-indigo-900 flex items-center">
+            <NuxtLink :to="`/type/${type.id}`" class="text-indigo-600 hover:text-indigo-900 flex items-center" :aria-label="`Voir toutes les serrures de type ${type.nom}`">
               Voir tout
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
               </svg>
             </NuxtLink>
@@ -43,16 +43,17 @@
             <!-- Liste horizontale des serrures de ce type -->
             <div class="flex overflow-x-auto pb-4 space-x-4 scrollbar-thin scrollbar-thumb-indigo-200 scrollbar-track-gray-100">
               <div v-for="serrure in type.id && typeSerrures[type.id] ? typeSerrures[type.id] : []" :key="serrure.id" class="flex-shrink-0 w-64">
-                <NuxtLink :to="`/serrure/${serrure.id}`" class="block rounded-lg overflow-hidden shadow-lg group hover:shadow-xl transition-shadow duration-300">
+                <NuxtLink :to="`/serrure/${serrure.id}`" class="block rounded-lg overflow-hidden shadow-lg group hover:shadow-xl transition-shadow duration-300" :aria-label="`Détails de la serrure ${serrure.designation || 'Sans nom'}`">
                   <div class="w-full h-48 bg-gray-100">
                     <img
                       v-if="serrure.photoUrl"
                       :src="serrure.photoUrl"
-                      :alt="serrure.designation || 'Serrure'"
+                      :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle || 'Sans nom'}`"
                       class="w-full h-full object-cover"
+                      loading="lazy"
                     />
                     <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300" aria-hidden="true">
                         <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
                       </svg>
                     </div>
@@ -82,16 +83,17 @@
           
           <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
             <div v-for="serrure in serruresSansType" :key="serrure.id" class="group relative">
-              <NuxtLink :to="`/serrure/${serrure.id}`" class="block group cursor-pointer">
+              <NuxtLink :to="`/serrure/${serrure.id}`" class="block group cursor-pointer" :aria-label="`Détails de la serrure ${serrure.designation || 'Sans nom'}`">
                 <div class="w-full bg-gray-100 rounded-lg overflow-hidden aspect-w-1 aspect-h-1 transition-shadow duration-300 group-hover:shadow-lg">
                   <img
                     v-if="serrure.photoUrl"
                     :src="serrure.photoUrl"
-                    :alt="serrure.designation || 'Serrure'"
+                    :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle || 'Sans nom'}`"
                     class="w-full h-full object-center object-cover"
+                    loading="lazy"
                   />
                   <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300" aria-hidden="true">
                       <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
                     </svg>
                   </div>
@@ -122,12 +124,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, useSSRContext } from 'vue'
 import type { Serrure } from '~/types/serrure'
 import type { TypeSerrure } from '~/types/typeSerrure'
 import { useSerrureService } from '~/services/serrureService'
 import { useTypeSerrureService } from '~/services/typeSerrureService'
 import useAuth from '~/composables/useAuth'
+import { useSeoMeta } from 'unhead'
+import { useSeoConfig } from '~/composables/useSeoConfig'
 
 // Définir cette page comme publique (pas besoin de middleware)
 definePageMeta({
@@ -141,6 +145,20 @@ const loading = ref(true)
 const serrureService = useSerrureService()
 const typeSerrureService = useTypeSerrureService()
 const { isLoggedIn } = useAuth()
+
+// Configuration SEO
+const { 
+  siteUrl, 
+  siteName, 
+  defaultOgImage, 
+  defaultTwitterImage, 
+  formatAuthor, 
+  twitterHandle,
+  googleVerification 
+} = useSeoConfig()
+
+const baseTitle = `Serrures de haute qualité - Catalogue de serrures professionnelles | ${siteName}`
+const baseDescription = 'Découvrez notre gamme complète de serrures professionnelles pour toutes applications. Sécurité, fiabilité et innovation garanties pour vos besoins résidentiels et industriels.'
 
 // Regrouper les serrures par type
 const typeSerrures = computed(() => {
@@ -195,14 +213,101 @@ onMounted(async () => {
   }
 })
 
+// Données structurées pour le SEO
+const generateStructuredData = () => {
+  const typeItems = typesAvecSerrures.value.map(type => {
+    // Récupérer les serrures de ce type (si le type a un ID défini)
+    const serrurenTypees = type.id && typeSerrures.value[type.id] 
+      ? typeSerrures.value[type.id].map(serrure => ({
+          "@type": "Product",
+          "name": serrure.designation || 'Serrure',
+          "description": `Serrure professionnelle de type ${type.nom}, code article: ${serrure.codeArticle}`,
+          "image": serrure.photoUrl || `${siteUrl}/placeholder-serrure.jpg`,
+          "url": `${siteUrl}/serrure/${serrure.id}`,
+          "brand": {
+            "@type": "Brand",
+            "name": siteName
+          },
+          "category": type.nom,
+          "sku": serrure.codeArticle,
+        }))
+      : [];
+
+    return {
+      "@type": "CollectionPage",
+      "name": type.nom,
+      "url": `${siteUrl}/type/${type.id}`,
+      "description": type.description || `Collection de serrures ${type.nom}`,
+      "hasPart": serrurenTypees
+    };
+  });
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": siteName,
+    "url": siteUrl,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${siteUrl}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    },
+    "about": {
+      "@type": "ItemList",
+      "itemListElement": typeItems.map((item, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": item.url,
+        "name": item.name
+      }))
+    }
+  };
+};
+
 // Fonction pour générer les métadonnées pour le SEO
+useSeoMeta({
+  title: baseTitle,
+  ogTitle: baseTitle,
+  description: baseDescription,
+  ogDescription: baseDescription,
+  ogImage: defaultOgImage,
+  twitterCard: 'summary_large_image',
+  ogType: 'website',
+  ogUrl: siteUrl,
+  ogSiteName: siteName,
+  twitterTitle: baseTitle,
+  twitterDescription: baseDescription,
+  twitterImage: defaultTwitterImage,
+  articleAuthor: formatAuthor('Votre Entreprise'),
+  articlePublishedTime: new Date().toISOString(),
+  articleModifiedTime: new Date().toISOString(),
+})
+
+// Injecter les données structurées
 useHead({
-  title: 'Serrures de haute qualité - Accueil',
+  title: baseTitle,
+  htmlAttrs: {
+    lang: 'fr'
+  },
   meta: [
-    { name: 'description', content: 'Découvrez notre gamme complète de serrures professionnelles. Sécurité, fiabilité et innovation au service de vos besoins.' },
-    { property: 'og:title', content: 'Serrures de haute qualité - Accueil' },
-    { property: 'og:description', content: 'Découvrez notre gamme complète de serrures professionnelles. Sécurité, fiabilité et innovation au service de vos besoins.' },
-    { property: 'og:type', content: 'website' }
+    { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+    { name: 'keywords', content: `serrures, serrures professionnelles, sécurité, serrures industrielles, serrures résidentielles, ${types.value.map(type => type.nom).join(', ')}` },
+    { name: 'author', content: siteName },
+    { property: 'og:locale', content: 'fr_FR' },
+    { name: 'twitter:creator', content: twitterHandle },
+    { name: 'google', content: 'nositelinkssearchbox' },
+    { name: 'google-site-verification', content: googleVerification }
+  ],
+  link: [
+    { rel: 'canonical', href: siteUrl },
+    { rel: 'alternate', href: siteUrl, hreflang: 'x-default' },
+    { rel: 'alternate', href: siteUrl, hreflang: 'fr' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify(generateStructuredData())
+    }
   ]
 })
 </script>

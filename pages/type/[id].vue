@@ -5,8 +5,9 @@
         <NuxtLink 
           to="/" 
           class="inline-flex items-center text-indigo-600 hover:text-indigo-900"
+          aria-label="Retour à la page d'accueil"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Retour à l'accueil
@@ -20,7 +21,7 @@
       <div v-else-if="!typeSerrure" class="bg-red-50 p-4 rounded-md">
         <div class="flex">
           <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
             </svg>
           </div>
@@ -58,16 +59,17 @@
         <!-- Grille de produits -->
         <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
           <div v-for="serrure in filteredSerrures" :key="serrure.id" class="group relative">
-            <NuxtLink :to="`/serrure/${serrure.id}`" class="block group cursor-pointer">
+            <NuxtLink :to="`/serrure/${serrure.id}`" class="block group cursor-pointer" :aria-label="`Détails de la serrure ${serrure.designation || 'Sans nom'}`">
               <div class="w-full bg-gray-100 rounded-lg overflow-hidden aspect-w-1 aspect-h-1 transition-shadow duration-300 group-hover:shadow-lg">
                 <img
                   v-if="serrure.photoUrl"
                   :src="serrure.photoUrl"
-                  :alt="serrure.designation || 'Serrure'"
+                  :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle || 'Sans nom'}`"
                   class="w-full h-full object-center object-cover"
+                  loading="lazy"
                 />
                 <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300" aria-hidden="true">
                     <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
                   </svg>
                 </div>
@@ -104,7 +106,8 @@ import type { TypeSerrure } from '~/types/typeSerrure'
 import { useSerrureService } from '~/services/serrureService'
 import { useTypeSerrureService } from '~/services/typeSerrureService'
 import useAuth from '~/composables/useAuth'
-import { useHead } from 'unhead'
+import { useSeoMeta } from 'unhead'
+import { useSeoConfig } from '~/composables/useSeoConfig'
 
 // Définir cette page comme publique (pas besoin de middleware)
 definePageMeta({
@@ -120,6 +123,16 @@ const serrureService = useSerrureService()
 const typeSerrureService = useTypeSerrureService()
 const { isLoggedIn } = useAuth()
 
+// Configuration SEO
+const { 
+  siteUrl, 
+  siteName, 
+  defaultProductImage, 
+  formatAuthor, 
+  getOgType,
+  defaultLocale
+} = useSeoConfig()
+
 // ID du type depuis l'URL
 const typeId = computed(() => route.params.id as string)
 
@@ -127,6 +140,69 @@ const typeId = computed(() => route.params.id as string)
 const filteredSerrures = computed(() => {
   return serrures.value.filter(serrure => serrure.typeSerrureId === typeId.value)
 })
+
+// Image pour les partages sociaux (première image de la catégorie ou image par défaut)
+const categoryImage = computed(() => {
+  return filteredSerrures.value.length > 0 && filteredSerrures.value[0].photoUrl
+    ? filteredSerrures.value[0].photoUrl
+    : defaultProductImage
+})
+
+// Générer les données structurées pour Schema.org
+const generateStructuredData = () => {
+  if (!typeSerrure.value) return {}
+
+  // Créer un tableau d'éléments pour chaque serrure
+  const itemListElement = filteredSerrures.value.map((serrure, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "Product",
+      "name": serrure.designation || 'Serrure',
+      "description": `Serrure professionnelle de type ${typeSerrure.value?.nom || ''}, code article: ${serrure.codeArticle}`,
+      "image": serrure.photoUrl || defaultProductImage,
+      "url": `${siteUrl}/serrure/${serrure.id}`,
+      "brand": {
+        "@type": "Brand",
+        "name": siteName
+      },
+      "category": typeSerrure.value?.nom,
+      "sku": serrure.codeArticle
+    }
+  }))
+
+  // Créer le schéma principal de type ItemList
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": `Serrures de type ${typeSerrure.value.nom}`,
+    "description": typeSerrure.value.description || `Collection de serrures professionnelles de type ${typeSerrure.value.nom}`,
+    "numberOfItems": itemListElement.length,
+    "itemListElement": itemListElement
+  }
+
+  // Créer le schéma BreadcrumbList pour le fil d'Ariane
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": siteUrl
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": typeSerrure.value.nom,
+        "item": `${siteUrl}/type/${typeId.value}`
+      }
+    ]
+  }
+
+  return [itemListSchema, breadcrumbSchema]
+}
 
 // Charger les données
 onMounted(async () => {
@@ -142,15 +218,56 @@ onMounted(async () => {
     serrures.value = serrugesData
     typeSerrure.value = typeData
     
-    // Générer les métadonnées SEO dynamiquement
     if (typeSerrure.value) {
+      const title = `${typeSerrure.value.nom} - Serrures de haute qualité | ${siteName}`
+      const description = typeSerrure.value.description || 
+        `Découvrez notre gamme complète de serrures ${typeSerrure.value.nom}. Sécurité, fiabilité et innovation au service de vos besoins.`
+        
+      // Keywords générés dynamiquement à partir des serrures de cette catégorie
+      const keywords = `serrures, ${typeSerrure.value.nom}, serrures professionnelles, sécurité, ${filteredSerrures.value.map(s => s.designation || s.codeArticle).join(', ')}`
+
+      // Configuration SEO optimisée
+      useSeoMeta({
+        title: title,
+        ogTitle: title,
+        description: description,
+        ogDescription: description,
+        ogImage: categoryImage.value,
+        twitterCard: 'summary_large_image',
+        ogType: getOgType('website'),
+        ogUrl: `${siteUrl}/type/${typeId.value}`,
+        ogSiteName: siteName,
+        twitterTitle: title,
+        twitterDescription: description,
+        twitterImage: categoryImage.value,
+        articleAuthor: formatAuthor(siteName),
+        articlePublishedTime: new Date().toISOString(),
+        articleModifiedTime: new Date().toISOString(),
+      })
+      
+      // Configuration avancée avec données structurées
       useHead({
-        title: `${typeSerrure.value.nom} - Serrures de haute qualité`,
+        title: title,
+        htmlAttrs: {
+          lang: 'fr'
+        },
         meta: [
-          { name: 'description', content: typeSerrure.value.description || `Découvrez notre gamme complète de serrures ${typeSerrure.value.nom}. Sécurité, fiabilité et innovation au service de vos besoins.` },
-          { property: 'og:title', content: `${typeSerrure.value.nom} - Serrures de haute qualité` },
-          { property: 'og:description', content: typeSerrure.value.description || `Découvrez notre gamme complète de serrures ${typeSerrure.value.nom}. Sécurité, fiabilité et innovation au service de vos besoins.` },
-          { property: 'og:type', content: 'website' }
+          { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+          { name: 'keywords', content: keywords },
+          { name: 'author', content: siteName },
+          { property: 'og:locale', content: defaultLocale },
+          { name: 'googlebot', content: 'index, follow' }
+        ],
+        link: [
+          { rel: 'canonical', href: `${siteUrl}/type/${typeId.value}` },
+          { rel: 'alternate', href: `${siteUrl}/type/${typeId.value}`, hreflang: 'x-default' },
+          { rel: 'alternate', href: `${siteUrl}/type/${typeId.value}`, hreflang: 'fr' }
+        ],
+        script: [
+          {
+            type: 'application/ld+json',
+            innerHTML: JSON.stringify(generateStructuredData())
+          }
         ]
       })
     }
