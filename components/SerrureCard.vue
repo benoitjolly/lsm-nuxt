@@ -17,9 +17,6 @@
         <div>
           <h4 class="font-medium text-gray-900">{{ serrure.codeArticle }}</h4>
           <p class="text-sm text-gray-500">{{ serrure.designation || 'Sans désignation' }}</p>
-          <span class="mt-2 inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
-            {{ serrure.typeDeCle }}
-          </span>
         </div>
       </div>
       
@@ -31,33 +28,13 @@
           </div>
           
           <div>
-            <h5 class="text-sm font-medium text-gray-500">Course</h5>
-            <p>{{ serrure.course }}</p>
-          </div>
-          
-          <div>
-            <h5 class="text-sm font-medium text-gray-500">Sens</h5>
-            <p>{{ serrure.sens }}</p>
-          </div>
-          
-          <div>
             <h5 class="text-sm font-medium text-gray-500">Type de Came</h5>
             <p>{{ serrure.typeDeCame }}</p>
-          </div>
-          
-          <div v-if="serrure.sortieDeCle">
-            <h5 class="text-sm font-medium text-gray-500">Sortie de Clé</h5>
-            <p>{{ serrure.sortieDeCle }}</p>
           </div>
           
           <div v-if="serrure.fixationSerrure">
             <h5 class="text-sm font-medium text-gray-500">Fixation Serrure</h5>
             <p>{{ serrure.fixationSerrure }}</p>
-          </div>
-          
-          <div v-if="serrure.pgPossible">
-            <h5 class="text-sm font-medium text-gray-500">PG Possible</h5>
-            <p>{{ serrure.pgPossible }}</p>
           </div>
         </div>
         

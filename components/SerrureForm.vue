@@ -17,20 +17,6 @@
         </div>
         
         <div>
-          <label for="typeDeCle" class="block text-sm font-medium text-gray-700">Type de Clé</label>
-          <select 
-            id="typeDeCle" 
-            v-model="serrure.typeDeCle" 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          >
-            <option value="">Sélectionner un type</option>
-            <option value="sans clé">Sans clé</option>
-            <option value="clé identique">Clé identique</option>
-            <option value="cle varis">Clé varis</option>
-          </select>
-        </div>
-        
-        <div>
           <label for="designation" class="block text-sm font-medium text-gray-700">Désignation</label>
           <input 
             type="text" 
@@ -51,54 +37,11 @@
         </div>
         
         <div>
-          <label for="course" class="block text-sm font-medium text-gray-700">Course</label>
-          <input 
-            type="text" 
-            id="course" 
-            v-model="serrure.course" 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        
-        <div>
-          <label for="sens" class="block text-sm font-medium text-gray-700">Sens</label>
-          <select 
-            id="sens" 
-            v-model="serrure.sens" 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          >
-            <option value="">Sélectionner un sens</option>
-            <option value="DouG">DouG</option>
-            <option value="GouD">GouD</option>
-          </select>
-        </div>
-        
-        <div>
-          <label for="sortieDeCle" class="block text-sm font-medium text-gray-700">Sortie de Clé</label>
-          <input 
-            type="text" 
-            id="sortieDeCle" 
-            v-model="serrure.sortieDeCle" 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        
-        <div>
           <label for="fixationSerrure" class="block text-sm font-medium text-gray-700">Fixation Serrure</label>
           <input 
             type="text" 
             id="fixationSerrure" 
             v-model="serrure.fixationSerrure" 
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        
-        <div>
-          <label for="pgPossible" class="block text-sm font-medium text-gray-700">PG Possible</label>
-          <input 
-            type="text" 
-            id="pgPossible" 
-            v-model="serrure.pgPossible" 
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
@@ -192,14 +135,9 @@ const emit = defineEmits<{
 
 const serrure = reactive<Serrure>({
   codeArticle: '',
-  typeDeCle: '',
   designation: '',
   longueurDuCorpsMm: 0,
-  course: '',
-  sens: '',
-  sortieDeCle: '',
   fixationSerrure: '',
-  pgPossible: '',
   typeDeCame: '',
   photoUrl: '',
   planUrl: '',
