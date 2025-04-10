@@ -25,11 +25,28 @@
         </div>
         
         <div v-else>
+          <!-- Champ de recherche -->
+          <div class="mb-8 max-w-md mx-auto">
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </span>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Rechercher une serrure..."
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+              />
+            </div>
+          </div>
+
           <!-- Affichage par type de serrure -->
-          <div v-for="(type, index) in typesAvecSerrures" :key="type.id" class="mb-12 last:mb-0">
+          <div v-for="typeWithSerrures in typesAvecSerrures" :key="typeWithSerrures.id" class="mb-12 last:mb-0">
             <div class="flex justify-between items-center mb-6">
-              <h2 class="text-2xl font-bold text-gray-900">{{ type.nom }}</h2>
-              <NuxtLink :to="`/type/${type.id}`" class="text-indigo-600 hover:text-indigo-900 flex items-center" :aria-label="`Voir toutes les serrures de type ${type.nom}`">
+              <h2 class="text-2xl font-bold text-gray-900">{{ typeWithSerrures.nom }}</h2>
+              <NuxtLink :to="`/type/${typeWithSerrures.id}`" class="text-indigo-600 hover:text-indigo-900 flex items-center" :aria-label="`Voir toutes les serrures de type ${typeWithSerrures.nom}`">
                 Voir tout
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
@@ -40,7 +57,7 @@
             <div class="relative">
               <!-- Liste horizontale des serrures de ce type -->
               <div class="flex overflow-x-auto pb-4 space-x-4 scrollbar-thin scrollbar-thumb-indigo-200 scrollbar-track-gray-100">
-                <div v-for="serrure in type.id && typeSerrures[type.id] ? typeSerrures[type.id] : []" :key="serrure.id" class="flex-shrink-0 w-64">
+                <div v-for="serrure in typeWithSerrures.serrures" :key="serrure.id" class="flex-shrink-0 w-64">
                   <NuxtLink :to="`/serrure/${serrure.id}`" class="block rounded-lg overflow-hidden shadow-lg group hover:shadow-xl transition-shadow duration-300" :aria-label="`Détails de la serrure ${serrure.designation || 'Sans nom'}`">
                     <div class="w-full h-48 bg-gray-100">
                       <img
@@ -68,7 +85,7 @@
                 </div>
                 
                 <!-- Message si aucune serrure pour ce type -->
-                <div v-if="!type.id || (typeSerrures[type.id] && typeSerrures[type.id].length === 0)" class="flex-1 flex items-center justify-center p-8 bg-gray-50 rounded-lg">
+                <div v-if="typeWithSerrures.serrures.length === 0" class="flex-1 flex items-center justify-center p-8 bg-gray-50 rounded-lg">
                   <p class="text-gray-500">Aucune serrure disponible pour ce type.</p>
                 </div>
               </div>
@@ -113,7 +130,11 @@
           </div>
           
           <!-- Message si aucun produit -->
-          <div v-if="serrures.length === 0" class="text-center py-12">
+          <div v-if="filteredSerrures.length === 0" class="text-center py-12">
+            <p class="text-gray-500 text-lg">Aucune serrure ne correspond à votre recherche.</p>
+          </div>
+          
+          <div v-else-if="serrures.length === 0" class="text-center py-12">
             <p class="text-gray-500 text-lg">Aucune serrure disponible pour le moment.</p>
           </div>
         </div>
@@ -129,13 +150,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, useSSRContext } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import type { Serrure } from '~/types/serrure'
 import type { TypeSerrure } from '~/types/typeSerrure'
 import { useSerrureService } from '~/services/serrureService'
 import { useTypeSerrureService } from '~/services/typeSerrureService'
 import useAuth from '~/composables/useAuth'
-import { useSeoMeta } from 'unhead'
+import { useSeoMeta, useHead } from 'unhead'
 import { useSeoConfig } from '~/composables/useSeoConfig'
 
 // Définir cette page comme publique (pas besoin de middleware)
@@ -144,12 +165,18 @@ definePageMeta({
   layout: 'default'
 })
 
+// Interface pour les types avec leurs serrures
+interface TypeWithSerrures extends TypeSerrure {
+  serrures: Serrure[];
+}
+
 const serrures = ref<Serrure[]>([])
 const types = ref<TypeSerrure[]>([])
 const loading = ref(true)
 const serrureService = useSerrureService()
 const typeSerrureService = useTypeSerrureService()
-const { isLoggedIn } = useAuth()
+const { isLoggedIn, hasRole } = useAuth()
+const searchQuery = ref('')
 
 // Configuration SEO
 const { 
@@ -165,42 +192,50 @@ const {
 const baseTitle = `Serrures Professionnelles de Haute Qualité | Sécurité & Fiabilité | ${siteName}`
 const baseDescription = 'Catalogue complet de serrures professionnelles pour applications résidentielles et industrielles. Découvrez nos serrures de haute qualité, fiables et sécurisées. Livraison rapide et service client expert.'
 
-const { hasRole } = useAuth()
-// Regrouper les serrures par type
-const typeSerrures = computed(() => {
-  const result: { [key: string]: Serrure[] } = {}
+// Serrures filtrées par la recherche
+const filteredSerrures = computed((): Serrure[] => {
+  if (!searchQuery.value.trim()) {
+    return serrures.value;
+  }
   
-  // Initialiser les tableaux vides pour tous les types
+  const query = searchQuery.value.toLowerCase();
+  return serrures.value.filter(serrure => {
+    return (
+      (serrure.designation && serrure.designation.toLowerCase().includes(query)) ||
+      (serrure.codeArticle && serrure.codeArticle.toLowerCase().includes(query)) ||
+      (serrure.typeDeCle && serrure.typeDeCle.toLowerCase().includes(query)) ||
+      (serrure.longueurDuCorpsMm && serrure.longueurDuCorpsMm.toString().includes(query)) ||
+      (serrure.typeSerrureNom && serrure.typeSerrureNom.toLowerCase().includes(query))
+    );
+  });
+});
+
+// Grouper les serrures filtrées par type
+const typesAvecSerrures = computed((): TypeWithSerrures[] => {
+  const result: Record<string, TypeWithSerrures> = {};
+  
+  // Initialiser avec les types disponibles
   types.value.forEach(type => {
     if (type.id) {
-      result[type.id] = []
+      result[type.id] = { ...type, serrures: [] };
     }
-  })
+  });
   
-  // Remplir les tableaux avec les serrures correspondantes
-  serrures.value.forEach(serrure => {
-    if (serrure.typeSerrureId) {
-      if (!result[serrure.typeSerrureId]) {
-        result[serrure.typeSerrureId] = []
-      }
-      result[serrure.typeSerrureId].push(serrure)
+  // Associer les serrures filtrées à leur type
+  filteredSerrures.value.forEach(serrure => {
+    if (serrure.typeSerrureId && result[serrure.typeSerrureId]) {
+      result[serrure.typeSerrureId].serrures.push(serrure);
     }
-  })
+  });
   
-  return result
-})
-
-// Filtrer les types qui ont au moins une serrure associée
-const typesAvecSerrures = computed(() => {
-  return types.value.filter(type => {
-    return type.id && typeSerrures.value[type.id]?.length > 0
-  })
-})
+  // Ne garder que les types qui ont au moins une serrure
+  return Object.values(result).filter(type => type.serrures.length > 0);
+});
 
 // Serrures sans type assigné
-const serruresSansType = computed(() => {
-  return serrures.value.filter(serrure => !serrure.typeSerrureId)
-})
+const serruresSansType = computed((): Serrure[] => {
+  return filteredSerrures.value.filter(serrure => !serrure.typeSerrureId);
+});
 
 // Charger les données uniquement côté client
 onMounted(async () => {
@@ -209,37 +244,35 @@ onMounted(async () => {
       const [serrugesData, typesData] = await Promise.all([
         serrureService.getAllSerrures(),
         typeSerrureService.getAllTypesSerrures()
-      ])
+      ]);
       
-      serrures.value = serrugesData
-      types.value = typesData
+      serrures.value = serrugesData;
+      types.value = typesData;
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error)
+      console.error('Erreur lors du chargement des données:', error);
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
-})
+});
 
 // Données structurées pour le SEO
 const generateStructuredData = () => {
   const typeItems = typesAvecSerrures.value.map(type => {
-    // Récupérer les serrures de ce type (si le type a un ID défini)
-    const serrurenTypees = type.id && typeSerrures.value[type.id] 
-      ? typeSerrures.value[type.id].map(serrure => ({
-          "@type": "Product",
-          "name": serrure.designation || 'Serrure',
-          "description": `Serrure professionnelle de type ${type.nom}, code article: ${serrure.codeArticle}`,
-          "image": serrure.photoUrl || `${siteUrl}/placeholder-serrure.jpg`,
-          "url": `${siteUrl}/serrure/${serrure.id}`,
-          "brand": {
-            "@type": "Brand",
-            "name": siteName
-          },
-          "category": type.nom,
-          "sku": serrure.codeArticle,
-        }))
-      : [];
+    // Récupérer les serrures de ce type
+    const serrurenTypees = type.serrures.map(serrure => ({
+      "@type": "Product",
+      "name": serrure.designation || 'Serrure',
+      "description": `Serrure professionnelle de type ${type.nom}, code article: ${serrure.codeArticle}`,
+      "image": serrure.photoUrl || `${siteUrl}/placeholder-serrure.jpg`,
+      "url": `${siteUrl}/serrure/${serrure.id}`,
+      "brand": {
+        "@type": "Brand",
+        "name": siteName
+      },
+      "category": type.nom,
+      "sku": serrure.codeArticle,
+    }));
 
     return {
       "@type": "CollectionPage",
@@ -289,7 +322,7 @@ useSeoMeta({
   articleAuthor: formatAuthor('Votre Entreprise'),
   articlePublishedTime: new Date().toISOString(),
   articleModifiedTime: new Date().toISOString(),
-})
+});
 
 // Injecter les données structurées
 useHead({
@@ -318,7 +351,7 @@ useHead({
       innerHTML: JSON.stringify(generateStructuredData())
     }
   ]
-})
+});
 </script>
 
 <style>
