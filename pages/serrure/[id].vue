@@ -70,7 +70,7 @@
           
           <div class="flex space-x-3">
             <button 
-              v-if="isLoggedIn"
+              v-if="isLoggedIn && isModerator"
               @click="editSerrure" 
               class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               aria-label="Modifier cette serrure"
@@ -81,7 +81,7 @@
               Modifier
             </button>
             <button 
-              v-if="isLoggedIn"
+              v-if="isLoggedIn && isModerator"
               @click="confirmDeleteSerrure" 
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               aria-label="Supprimer cette serrure"
@@ -167,11 +167,13 @@
       
       <!-- Formulaire d'édition -->
       <div v-if="showForm" class="mt-6">
-        <SerrureForm 
-          :initial-serrure="serrure" 
-          @submit="handleFormSubmit" 
-          @cancel="cancelForm"
-        />
+        <EditAuthCheck>
+          <SerrureForm 
+            :initial-serrure="serrure" 
+            @submit="handleFormSubmit" 
+            @cancel="cancelForm"
+          />
+        </EditAuthCheck>
       </div>
       
       <!-- Modal de confirmation de suppression -->
@@ -211,8 +213,9 @@ import { useSerrureService } from '~/services/serrureService'
 import { useTypeSerrureService } from '~/services/typeSerrureService'
 import useAuth from '~/composables/useAuth'
 import { useSeoConfig } from '~/composables/useSeoConfig'
+import EditAuthCheck from '~/components/EditAuthCheck.vue'
 
-// Définir cette page comme publique (pas besoin de middleware)
+// Cette page est publique pour l'affichage, mais nécessite des droits de modérateur pour les modifications
 definePageMeta({
   middleware: [],
   layout: 'default'
@@ -229,7 +232,7 @@ const showDeleteModal = ref(false)
 const serrureService = useSerrureService()
 const { getSerrureById } = useSerrureService()
 const { getTypeSerrureById } = useTypeSerrureService()
-const { isLoggedIn } = useAuth()
+const { isLoggedIn, isModerator } = useAuth()
 
 // Configuration SEO
 const { 

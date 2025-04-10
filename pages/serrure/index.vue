@@ -10,19 +10,21 @@
       <!-- Formulaire d'ajout/modification -->
       <div v-if="showForm">
         <!-- Gestion des types de serrures -->
-        <TypeSerrureForm 
-          ref="typeSerrureFormRef" 
-          class="mb-6"
-          @types-updated="handleTypesUpdated"
-        />
-      
-        <SerrureForm 
-          :initial-serrure="selectedSerrure" 
-          @submit="handleFormSubmit" 
-          @cancel="cancelForm"
-          @unauthorized="handleUnauthorized"
-          ref="serrureFormRef"
-        />
+        <EditAuthCheck>
+          <TypeSerrureForm 
+            ref="typeSerrureFormRef" 
+            class="mb-6"
+            @types-updated="handleTypesUpdated"
+          />
+        
+          <SerrureForm 
+            :initial-serrure="selectedSerrure" 
+            @submit="handleFormSubmit" 
+            @cancel="cancelForm"
+            @unauthorized="handleUnauthorized"
+            ref="serrureFormRef"
+          />
+        </EditAuthCheck>
       </div>
       
       <!-- Liste des serrures -->
@@ -245,6 +247,7 @@ import TypeSerrureForm from '~/components/TypeSerrureForm.vue'
 import SerrureForm from '~/components/SerrureForm.vue'
 import useAuth from '~/composables/useAuth'
 import { useRouter } from 'vue-router'
+import EditAuthCheck from '~/components/EditAuthCheck.vue'
 
 // Définir le middleware pour les modérateurs
 definePageMeta({
