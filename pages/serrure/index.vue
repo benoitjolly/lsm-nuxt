@@ -20,6 +20,7 @@
           :initial-serrure="selectedSerrure" 
           @submit="handleFormSubmit" 
           @cancel="cancelForm"
+          @unauthorized="handleUnauthorized"
           ref="serrureFormRef"
         />
       </div>
@@ -54,7 +55,7 @@
             
             <!-- Bouton d'ajout -->
             <button 
-              v-if="isLoggedIn"
+              v-if="isAdmin"
               @click="addNewSerrure" 
               class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto transition duration-150 ease-in-out"
             >
@@ -105,7 +106,7 @@
                     <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
                     Type de Serrure 
                   </th>
-                  <th v-if="isLoggedIn" scope="col" class="relative px-3 py-3">
+                  <th v-if="isAdmin" scope="col" class="relative px-3 py-3">
                     <span class="sr-only">Actions</span>
                   </th>
                 </tr>
@@ -166,7 +167,7 @@
                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
                     {{ serrure.typeSerrureNom }}
                   </td>
-                  <td v-if="isLoggedIn" class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td v-if="isAdmin" class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-2">
                       <NuxtLink 
                         :to="`/serrure/${serrure.id}`" 
@@ -241,12 +242,16 @@ import { ref, computed, onMounted } from 'vue'
 import { useSerrureService } from '~/services/serrureService'
 import type { Serrure } from '~/types/serrure'
 import TypeSerrureForm from '~/components/TypeSerrureForm.vue'
+import SerrureForm from '~/components/SerrureForm.vue'
 import useAuth from '~/composables/useAuth'
+import { useRouter } from 'vue-router'
 
-// Définir le middleware d'authentification
+// Définir le middleware d'administration
 definePageMeta({
-  middleware: ['auth']
+  middleware: ['admin']
 })
+
+const router = useRouter()
 
 // État
 const serrures = ref<Serrure[]>([])
@@ -256,14 +261,14 @@ const selectedSerrure = ref<Partial<Serrure> | undefined>(undefined)
 const searchQuery = ref('')
 const showDeleteModal = ref(false)
 const serrureToDeleteId = ref<string | undefined>(undefined)
-const typeSerrureFormRef = ref(null)
-const serrureFormRef = ref(null)
+const typeSerrureFormRef = ref<InstanceType<typeof TypeSerrureForm> | null>(null)
+const serrureFormRef = ref<InstanceType<typeof SerrureForm> | null>(null)
 
 // Services
 const serrureService = useSerrureService()
 
 // Authentification
-const { isLoggedIn } = useAuth()
+const { isAdmin } = useAuth()
 
 // Serrures filtrées par la recherche
 const filteredSerrures = computed(() => {
@@ -372,5 +377,12 @@ const handleTypesUpdated = () => {
   if (serrureFormRef.value) {
     serrureFormRef.value.updateTypesSerrure()
   }
+}
+
+// Gérer le cas où l'utilisateur n'est pas autorisé
+const handleUnauthorized = () => {
+  showForm.value = false
+  selectedSerrure.value = undefined
+  router.push('/')
 }
 </script> 

@@ -16,8 +16,8 @@ const { setUser, setAuthenticated } = useAuth()
 onMounted(() => {
   const { auth } = initializeFirebase()
   if (auth) {
-    onAuthStateChanged(auth, (user) => {
-      setUser(user)
+    onAuthStateChanged(auth, async (user) => {
+      await setUser(user)
       setAuthenticated(!!user)
     })
   }

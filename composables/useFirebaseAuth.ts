@@ -3,6 +3,7 @@ import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, si
 import { ref, computed } from 'vue'
 import { initializeFirebase } from '~/utils/firebase'
 import useAuth from './useAuth'
+import { useUserService } from '~/services/userService'
 
 export const useFirebaseAuth = () => {
   const user = ref<User | null>(null)
@@ -10,6 +11,7 @@ export const useFirebaseAuth = () => {
   const loading = ref(true)
   
   const { setUser, setAuthenticated } = useAuth()
+  const userService = useUserService()
 
   const { auth } = initializeFirebase()
   
@@ -38,7 +40,10 @@ export const useFirebaseAuth = () => {
       const result = await signInWithPopup(auth, googleProvider)
       user.value = result.user
       
-      setUser(result.user)
+      // Enregistrer l'utilisateur dans Firestore
+      await userService.createOrUpdateUser(result.user)
+      
+      await setUser(result.user)
       setAuthenticated(true)
       
       return true
@@ -59,7 +64,10 @@ export const useFirebaseAuth = () => {
       const result = await signInWithEmailAndPassword(auth, email, password)
       user.value = result.user
       
-      setUser(result.user)
+      // Enregistrer l'utilisateur dans Firestore
+      await userService.createOrUpdateUser(result.user)
+      
+      await setUser(result.user)
       setAuthenticated(true)
       
       return true
@@ -80,7 +88,10 @@ export const useFirebaseAuth = () => {
       const result = await createUserWithEmailAndPassword(auth, email, password)
       user.value = result.user
       
-      setUser(result.user)
+      // Enregistrer l'utilisateur dans Firestore
+      await userService.createOrUpdateUser(result.user)
+      
+      await setUser(result.user)
       setAuthenticated(true)
       
       return true
@@ -121,8 +132,14 @@ export const useFirebaseAuth = () => {
   }
 
   // Observer les changements d'état d'authentification
-  onAuthStateChanged(auth, (newUser) => {
+  onAuthStateChanged(auth, async (newUser) => {
     user.value = newUser
+    
+    // Si l'utilisateur est connecté, mettre à jour ses infos
+    if (newUser) {
+      await userService.createOrUpdateUser(newUser)
+    }
+    
     loading.value = false
   })
 

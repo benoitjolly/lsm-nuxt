@@ -1,15 +1,23 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // Fonction pour vérifier si l'utilisateur est administrateur
+    function isAdmin() {
+      return request.auth != null && 
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
+    }
+    
     // Permettre à tous de lire les photos des serrures
     match /serrures/{serrureId}/{image} {
       allow read: if true;
-      allow write, delete: if request.auth != null;
+      allow write, delete: if isAdmin();
     }
     
-    // Autres fichiers nécessitent l'authentification
+    // Autres fichiers nécessitent l'authentification d'un administrateur
     match /{allPaths=**} {
-      allow read, write: if request.auth != null;
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 } 

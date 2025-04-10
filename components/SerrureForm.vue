@@ -140,6 +140,7 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import type { Serrure } from '~/types/serrure'
 import type { TypeSerrure } from '~/types/typeSerrure'
 import { useTypeSerrureService } from '~/services/typeSerrureService'
+import useAuth from '~/composables/useAuth'
 
 const props = defineProps<{
   initialSerrure?: Partial<Serrure>
@@ -148,6 +149,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'submit', serrure: Serrure, photoFile?: File, planFile?: File): void
   (e: 'cancel'): void
+  (e: 'unauthorized'): void
 }>()
 
 const serrure = reactive<Serrure>({
@@ -173,6 +175,7 @@ const loading = ref(false)
 const typesSerrure = ref<TypeSerrure[]>([])
 
 const typeSerrureService = useTypeSerrureService()
+const { isAdmin } = useAuth()
 
 onMounted(async () => {
   if (props.initialSerrure) {
@@ -184,6 +187,11 @@ onMounted(async () => {
     typesSerrure.value = await typeSerrureService.getAllTypesSerrures()
   } catch (err) {
     console.error('Erreur lors du chargement des types de serrures:', err)
+  }
+  
+  // Vérifier si l'utilisateur est administrateur
+  if (!isAdmin.value) {
+    emit('unauthorized')
   }
 })
 
@@ -232,6 +240,12 @@ const handleTypeChange = () => {
 }
 
 const submitForm = () => {
+  // Vérifier si l'utilisateur est administrateur
+  if (!isAdmin.value) {
+    emit('unauthorized')
+    return
+  }
+  
   loading.value = true
   emit('submit', serrure as Serrure, photoFile.value || undefined, planFile.value || undefined)
 }
