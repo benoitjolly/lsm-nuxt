@@ -6,9 +6,9 @@
           Serrures de haute qualité
         </h1>
         
-        <div v-if="isLoggedIn">
+        <div v-if="isLoggedIn && hasRole('admin')">
           <NuxtLink to="/serrure" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
-            Administration
+            Gestion des serrures
           </NuxtLink>
         </div>
       
@@ -156,6 +156,7 @@ const {
 const baseTitle = `Serrures Professionnelles de Haute Qualité | Sécurité & Fiabilité | ${siteName}`
 const baseDescription = 'Catalogue complet de serrures professionnelles pour applications résidentielles et industrielles. Découvrez nos serrures de haute qualité, fiables et sécurisées. Livraison rapide et service client expert.'
 
+const { hasRole } = useAuth()
 // Regrouper les serrures par type
 const typeSerrures = computed(() => {
   const result: { [key: string]: Serrure[] } = {}

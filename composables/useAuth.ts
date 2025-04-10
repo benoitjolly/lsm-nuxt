@@ -59,6 +59,10 @@ export default function useAuth() {
     return userRoles.value.includes('admin')
   })
 
+  const isModerator = computed(() => {
+    return userRoles.value.includes('admin') || userRoles.value.includes('moderator')
+  })
+
   const hasRole = (role: string) => {
     return userRoles.value.includes(role)
   }
@@ -73,6 +77,7 @@ export default function useAuth() {
     logout,
     isLoggedIn,
     isAdmin,
+    isModerator,
     hasRole
   }
 } 

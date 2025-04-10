@@ -55,7 +55,7 @@
             
             <!-- Bouton d'ajout -->
             <button 
-              v-if="isAdmin"
+              v-if="isModerator"
               @click="addNewSerrure" 
               class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto transition duration-150 ease-in-out"
             >
@@ -106,7 +106,7 @@
                     <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
                     Type de Serrure 
                   </th>
-                  <th v-if="isAdmin" scope="col" class="relative px-3 py-3">
+                  <th v-if="isModerator" scope="col" class="relative px-3 py-3">
                     <span class="sr-only">Actions</span>
                   </th>
                 </tr>
@@ -167,7 +167,7 @@
                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
                     {{ serrure.typeSerrureNom }}
                   </td>
-                  <td v-if="isAdmin" class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td v-if="isModerator" class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-2">
                       <NuxtLink 
                         :to="`/serrure/${serrure.id}`" 
@@ -246,9 +246,9 @@ import SerrureForm from '~/components/SerrureForm.vue'
 import useAuth from '~/composables/useAuth'
 import { useRouter } from 'vue-router'
 
-// Définir le middleware d'administration
+// Définir le middleware pour les modérateurs
 definePageMeta({
-  middleware: ['admin']
+  middleware: ['moderator']
 })
 
 const router = useRouter()
@@ -268,7 +268,7 @@ const serrureFormRef = ref<InstanceType<typeof SerrureForm> | null>(null)
 const serrureService = useSerrureService()
 
 // Authentification
-const { isAdmin } = useAuth()
+const { isModerator } = useAuth()
 
 // Serrures filtrées par la recherche
 const filteredSerrures = computed(() => {

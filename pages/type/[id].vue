@@ -40,7 +40,7 @@
             {{ typeSerrure.nom }}
           </h1>
           
-          <div v-if="isAdmin">
+          <div v-if="isModerator">
             <NuxtLink to="/serrure" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
               Administration
             </NuxtLink>
@@ -117,7 +117,7 @@ const typeSerrure = ref<TypeSerrure | null>(null)
 const loading = ref(true)
 const serrureService = useSerrureService()
 const typeSerrureService = useTypeSerrureService()
-const { isLoggedIn, isAdmin } = useAuth()
+const { isLoggedIn, isAdmin, isModerator } = useAuth()
 
 // Configuration SEO
 const { 

@@ -8,10 +8,17 @@ service firebase.storage {
         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
     }
     
+    // Fonction pour vérifier si l'utilisateur est modérateur ou admin
+    function isModerator() {
+      return request.auth != null && 
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin', 'moderator']);
+    }
+    
     // Permettre à tous de lire les photos des serrures
     match /serrures/{serrureId}/{image} {
       allow read: if true;
-      allow write, delete: if isAdmin();
+      allow write, delete: if isModerator();
     }
     
     // Autres fichiers nécessitent l'authentification d'un administrateur

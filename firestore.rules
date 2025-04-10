@@ -8,13 +8,20 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
     }
     
+    // Fonction pour vérifier si l'utilisateur est modérateur ou admin
+    function isModerator() {
+      return request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin', 'moderator']);
+    }
+    
     // Règles pour la collection serrures
     match /serrures/{serrureId} {
       // Permettre à tous les utilisateurs (même non connectés) de lire les données
       allow read: if true;
       
-      // Permettre uniquement aux utilisateurs administrateurs de créer, mettre à jour ou supprimer
-      allow create, update, delete: if isAdmin();
+      // Permettre aux modérateurs ET administrateurs de gérer les serrures
+      allow create, update, delete: if isModerator();
     }
     
     // Règles pour la collection types-serrures
@@ -22,8 +29,8 @@ service cloud.firestore {
       // Permettre à tous les utilisateurs (même non connectés) de lire les données
       allow read: if true;
       
-      // Permettre uniquement aux utilisateurs administrateurs de créer, mettre à jour ou supprimer
-      allow create, update, delete: if isAdmin();
+      // Permettre aux modérateurs ET administrateurs de gérer les types de serrures
+      allow create, update, delete: if isModerator();
     }
     
     // Règles pour la collection users
