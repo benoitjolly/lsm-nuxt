@@ -4,9 +4,9 @@
                 sm:w-20 sm:min-h-[calc(100%-40px)] sm:my-4 sm:mx-4 sm:flex-col
                 w-full h-20 top-0 left-0 flex flex-row items-center justify-between px-4 py-2">
       <div class="sm:mb-8 sm:mt-0 mt-0">
-        <NuxtLink to="/" class="block p-2 rounded-lg border border-gray-200">
-          <div class="w-10 h-6 flex items-center justify-center">
-            <span class="text-gray-900 font-bold text-1xl p-2">LSM</span>
+        <NuxtLink to="/" class="block p-1 rounded-lg border border-gray-200 hover:bg-gray-100">
+          <div class="w-10 h-10 flex items-center justify-center">
+            <img src="~/assets/images/logo.png" alt="LSM Logo" class="w-full h-auto rounded-lg" />
           </div>
         </NuxtLink>
       </div>
