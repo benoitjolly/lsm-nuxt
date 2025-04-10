@@ -6,7 +6,22 @@ import type { Serrure } from '~/types/serrure'
 const COLLECTION_NAME = 'serrures'
 
 export const useSerrureService = () => {
-  // Initialiser Firebase directement dans le service
+  // Vérifier si nous sommes côté serveur
+  if (process.server) {
+    // Retourner des implémentations vides pour le rendu SSR
+    return {
+      addSerrure: async () => "",
+      getAllSerrures: async () => [] as Serrure[],
+      getSerrureById: async () => null,
+      updateSerrure: async () => {},
+      deleteSerrure: async () => {},
+      searchSerruresByCode: async () => [] as Serrure[],
+      uploadPhoto: async () => "",
+      uploadPlan: async () => ""
+    }
+  }
+
+  // Initialiser Firebase uniquement côté client
   const { db, storage } = initializeFirebase()
   
   if (!db || !storage) {

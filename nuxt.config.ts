@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  ssr: true, // Désactiver le SSR pour gérer l'authentification uniquement côté client
+  ssr: true,
   css: ["~/assets/css/tailwind.css"],
 
   postcss: {
@@ -15,11 +15,15 @@ export default defineNuxtConfig({
 
   modules: ['@nuxtjs/tailwindcss'],
 
-
   routeRules: {
-    '/serrure': { swr: true },
-    '/serrure/**': { swr: true },
-
+    '/serrure': { ssr: false }, // Désactiver le SSR pour les routes protégées
+    '/serrure/**': { ssr: false },
+    '/admin/**': { ssr: false },
+    '/profile': { ssr: false },
+    '/login': { ssr: false },
+    '/register': { ssr: false },
+    '/reset-password': { ssr: false },
+    '/': { swr: true },
   },
   
   // Configuration des variables d'environnement

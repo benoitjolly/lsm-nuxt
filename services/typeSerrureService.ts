@@ -3,7 +3,19 @@ import { initializeFirebase } from '~/utils/firebase'
 import type { TypeSerrure } from '~/types/typeSerrure'
 
 export const useTypeSerrureService = () => {
-  // Initialiser Firebase directement dans le service
+  // Vérifier si nous sommes côté serveur
+  if (process.server) {
+    // Retourner des implémentations vides pour le rendu SSR
+    return {
+      getAllTypesSerrures: async () => [] as TypeSerrure[],
+      addTypeSerrure: async () => ({ id: '', nom: '', description: '' } as TypeSerrure),
+      deleteTypeSerrure: async () => {},
+      updateTypeSerrure: async () => {},
+      getTypeSerrureById: async () => null
+    }
+  }
+
+  // Initialiser Firebase uniquement côté client
   const { db } = initializeFirebase()
   
   if (!db) {

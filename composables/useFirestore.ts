@@ -2,6 +2,10 @@ import { getFirestore } from 'firebase/firestore'
 import { initializeFirebase } from '~/utils/firebase'
 
 export const useFirestore = () => {
-  initializeFirebase()
-  return getFirestore()
+  if (process.server) {
+    return null
+  }
+  
+  const { db } = initializeFirebase()
+  return db
 } 

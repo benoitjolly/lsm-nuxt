@@ -12,14 +12,16 @@ import useAuth from '~/composables/useAuth'
 
 const { setUser, setAuthenticated } = useAuth()
 
-// Initialiser l'état d'authentification
+// Initialiser l'état d'authentification uniquement côté client
 onMounted(() => {
-  const { auth } = initializeFirebase()
-  if (auth) {
-    onAuthStateChanged(auth, async (user) => {
-      await setUser(user)
-      setAuthenticated(!!user)
-    })
+  if (process.client) {
+    const { auth } = initializeFirebase()
+    if (auth) {
+      onAuthStateChanged(auth, async (user) => {
+        await setUser(user)
+        setAuthenticated(!!user)
+      })
+    }
   }
 })
 </script>

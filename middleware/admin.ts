@@ -3,9 +3,20 @@ import { onAuthStateChanged } from 'firebase/auth'
 import useAuth from '~/composables/useAuth'
 
 export default defineNuxtRouteMiddleware((to, from) => {
+  // Si on est côté serveur en mode SSR, laisser passer
+  // Le client gèrera l'authentification
+  if (process.server) {
+    return
+  }
+  
   // Initialiser Firebase et récupérer l'instance auth
   const { auth } = initializeFirebase()
-  const { isAdmin } = useAuth()
+  const { isAdmin, isLoggedIn } = useAuth()
+  
+  // Si on est déjà authentifié côté client et qu'on est admin, laisser passer
+  if (isLoggedIn.value && isAdmin.value) {
+    return
+  }
   
   // Si auth n'est pas disponible, rediriger vers la page de connexion
   if (!auth) {
