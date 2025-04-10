@@ -45,11 +45,7 @@
               Administration
             </NuxtLink>
           </div>
-          <div v-else>
-            <NuxtLink to="/login" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-150">
-              Connexion
-            </NuxtLink>
-          </div>
+        
         </div>
         
         <p v-if="typeSerrure.description" class="text-lg text-gray-500 max-w-3xl mb-12">

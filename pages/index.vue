@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white">
-    <div class="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
+    <div class="max-w-2xl mx-auto py-16 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
           Serrures de haute qualité
@@ -11,11 +11,7 @@
             Administration
           </NuxtLink>
         </div>
-        <div v-else>
-          <NuxtLink to="/login" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-150">
-            Connexion
-          </NuxtLink>
-        </div>
+      
       </div>
       
       <p class="text-lg text-gray-500 max-w-3xl mb-12">
