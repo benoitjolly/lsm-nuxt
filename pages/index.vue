@@ -9,7 +9,7 @@
       </div>
       
       <ClientOnly>
-        <div v-if="isLoggedIn && hasRole('admin')" class="mt-4 sm:mt-0">
+        <div v-if="isLoggedIn && isModerator" class="mt-4 sm:mt-0">
           <NuxtLink to="/serrure" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
             Gestion des serrures
           </NuxtLink>
@@ -174,7 +174,7 @@ const types = ref<TypeSerrure[]>([])
 const loading = ref(true)
 const serrureService = useSerrureService()
 const typeSerrureService = useTypeSerrureService()
-const { isLoggedIn, hasRole } = useAuth()
+const { isLoggedIn, hasRole, isModerator } = useAuth()
 const searchQuery = ref('')
 
 // Configuration SEO

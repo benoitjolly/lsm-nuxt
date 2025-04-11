@@ -175,7 +175,7 @@ const loading = ref(false)
 const typesSerrure = ref<TypeSerrure[]>([])
 
 const typeSerrureService = useTypeSerrureService()
-const { isAdmin } = useAuth()
+const { isModerator } = useAuth()
 
 onMounted(async () => {
   if (props.initialSerrure) {
@@ -189,8 +189,8 @@ onMounted(async () => {
     console.error('Erreur lors du chargement des types de serrures:', err)
   }
   
-  // Vérifier si l'utilisateur est administrateur
-  if (!isAdmin.value) {
+  // Vérifier si l'utilisateur est modérateur ou admin
+  if (!isModerator.value) {
     emit('unauthorized')
   }
 })
@@ -240,8 +240,8 @@ const handleTypeChange = () => {
 }
 
 const submitForm = () => {
-  // Vérifier si l'utilisateur est administrateur
-  if (!isAdmin.value) {
+  // Vérifier si l'utilisateur est modérateur ou admin
+  if (!isModerator.value) {
     emit('unauthorized')
     return
   }
