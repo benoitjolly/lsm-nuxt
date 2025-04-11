@@ -3,7 +3,7 @@
     <ClientProfile @logout="onLogout" />
     
     <template #fallback>
-      <div class="p-6">
+      <div>
         <h1 class="text-2xl font-bold text-gray-900 mb-6">Mon Profil</h1>
         <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
           <div class="px-4 py-5 sm:px-6">

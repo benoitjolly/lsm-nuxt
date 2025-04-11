@@ -52,7 +52,7 @@
       </div>
     </div>
 
-    <div class="pt-24 sm:pt-0 sm:ml-24">
+    <div class="pt-24 sm:pt-0 sm:ml-24 bg-gray-100 min-h-screen">
       <main class="py-6 px-4 sm:px-6 lg:px-8">
         <slot />
       </main>
@@ -73,4 +73,18 @@ const handleLogout = async () => {
     router.push('/login')
   }
 }
-</script> 
+</script>
+
+<style>
+html, body {
+  background-color: #f3f4f6; /* bg-gray-100 */
+  min-height: 100%;
+  height: 100%;
+}
+
+#__nuxt {
+  height: 100%;
+  min-height: 100vh;
+  background-color: #f3f4f6; /* bg-gray-100 */
+}
+</style> 

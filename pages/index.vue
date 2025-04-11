@@ -1,30 +1,33 @@
 <template>
-  <div class="bg-white">
-    <div class="max-w-2xl mx-auto py-16 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-          Serrures de haute qualité
-        </h1>
-        
-        <ClientOnly>
-          <div v-if="isLoggedIn && hasRole('admin')">
-            <NuxtLink to="/serrure" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
-              Gestion des serrures
-            </NuxtLink>
-          </div>
-        </ClientOnly>
+  <div>
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">Serrures de haute qualité</h1>
+        <p class="text-sm text-gray-500 max-w-3xl">
+          Découvrez notre gamme complète de serrures professionnelles. Sécurité, fiabilité et innovation au service de vos besoins.
+        </p>
       </div>
       
-      <p class="text-lg text-gray-500 max-w-3xl mb-12">
-        Découvrez notre gamme complète de serrures professionnelles. Sécurité, fiabilité et innovation au service de vos besoins.
-      </p>
+      <ClientOnly>
+        <div v-if="isLoggedIn && hasRole('admin')" class="mt-4 sm:mt-0">
+          <NuxtLink to="/serrure" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
+            Gestion des serrures
+          </NuxtLink>
+        </div>
+      </ClientOnly>
+    </div>
+    
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+      <div class="px-4 py-5 sm:px-6">
+        <!-- Pas besoin de contenu ici maintenant que le bouton a été déplacé -->
+      </div>
       
       <ClientOnly>
-        <div v-if="loading" class="flex justify-center items-center py-12">
+        <div v-if="loading" class="px-4 py-12 flex justify-center items-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
         
-        <div v-else>
+        <div v-else class="px-4 py-5 sm:px-6">
           <!-- Champ de recherche -->
           <div class="mb-8 max-w-md mx-auto">
             <div class="relative">
@@ -45,7 +48,7 @@
           <!-- Affichage par type de serrure -->
           <div v-for="typeWithSerrures in typesAvecSerrures" :key="typeWithSerrures.id" class="mb-12 last:mb-0">
             <div class="flex justify-between items-center mb-6">
-              <h2 class="text-2xl font-bold text-gray-900">{{ typeWithSerrures.nom }}</h2>
+              <h3 class="text-lg leading-6 font-medium text-gray-900">{{ typeWithSerrures.nom }}</h3>
               <NuxtLink :to="`/type/${typeWithSerrures.id}`" class="text-indigo-600 hover:text-indigo-900 flex items-center" :aria-label="`Voir toutes les serrures de type ${typeWithSerrures.nom}`">
                 Voir tout
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -93,8 +96,8 @@
           </div>
           
           <!-- Section pour les serrures sans type assigné -->
-          <div v-if="serruresSansType.length > 0" class="mt-16">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Autres serrures</h2>
+          <div v-if="serruresSansType.length > 0" class="mt-8">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-6">Autres serrures</h3>
             
             <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
               <div v-for="serrure in serruresSansType" :key="serrure.id" class="group relative">
@@ -140,7 +143,7 @@
         </div>
 
         <template #fallback>
-          <div class="text-center py-12">
+          <div class="px-4 py-5 sm:px-6 text-center py-12">
             <p class="text-gray-500 text-lg">Chargement des données...</p>
           </div>
         </template>

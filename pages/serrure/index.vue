@@ -1,14 +1,14 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div>
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Gestion des Serrures</h1>
     
-    <div v-if="loading" class="flex justify-center items-center py-12">
+    <div v-if="loading" class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 p-6 flex justify-center items-center">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
     </div>
     
     <div v-else>
       <!-- Formulaire d'ajout/modification -->
-      <div v-if="showForm">
+      <div v-if="showForm" class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 p-6">
         <!-- Gestion des types de serrures -->
         <EditAuthCheck>
           <TypeSerrureForm 
