@@ -18,10 +18,6 @@
     </div>
     
     <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-      <div class="px-4 py-5 sm:px-6">
-        <!-- Pas besoin de contenu ici maintenant que le bouton a été déplacé -->
-      </div>
-      
       <ClientOnly>
         <div v-if="loading" class="px-4 py-12 flex justify-center items-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
