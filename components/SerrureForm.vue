@@ -97,17 +97,32 @@
           <div class="mt-1 flex items-center">
             <div v-if="planPreview || serrure.planUrl" class="mr-4">
               <img 
+                v-if="!isPlanPdf" 
                 :src="planPreview || serrure.planUrl" 
                 alt="Aperçu du plan" 
                 class="h-32 w-32 object-cover rounded-md"
               />
+              <div v-else class="h-32 w-32 bg-gray-100 rounded-md flex flex-col items-center justify-center p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-indigo-600 mb-1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                </svg>
+                <span class="text-xs text-gray-600 text-center">Fichier PDF</span>
+                <a 
+                  v-if="serrure.planUrl && !planPreview" 
+                  :href="serrure.planUrl" 
+                  target="_blank"
+                  class="text-xs text-indigo-600 hover:underline mt-1"
+                >
+                  Voir le PDF
+                </a>
+              </div>
             </div>
             <input 
               type="file" 
               id="plan" 
               ref="planInput"
               @change="handlePlanChange" 
-              accept="image/*"
+              accept="image/*,.pdf,application/pdf"
               class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-5 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition duration-150 ease-in-out cursor-pointer p-2 border border-dashed border-gray-300 rounded-md hover:border-indigo-300"
             />
           </div>
@@ -171,6 +186,7 @@ const photoPreview = ref<string | null>(null)
 const planInput = ref<HTMLInputElement | null>(null)
 const planFile = ref<File | null>(null)
 const planPreview = ref<string | null>(null)
+const isPlanPdf = ref(false)
 const loading = ref(false)
 const typesSerrure = ref<TypeSerrure[]>([])
 
@@ -180,6 +196,11 @@ const { isModerator } = useAuth()
 onMounted(async () => {
   if (props.initialSerrure) {
     Object.assign(serrure, props.initialSerrure)
+    
+    // Vérifier si le plan existant est un PDF
+    if (serrure.planUrl) {
+      isPlanPdf.value = serrure.planUrl.toLowerCase().endsWith('.pdf')
+    }
   }
   
   // Charger les types de serrures
@@ -217,13 +238,17 @@ const handlePhotoChange = (event: Event) => {
 const handlePlanChange = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.files && input.files[0]) {
-    planFile.value = input.files[0]
+    const file = input.files[0]
+    planFile.value = file
+    
+    // Vérifier si le fichier est un PDF
+    isPlanPdf.value = file.type === 'application/pdf'
     
     const reader = new FileReader()
     reader.onload = (e) => {
       planPreview.value = e.target?.result as string
     }
-    reader.readAsDataURL(input.files[0])
+    reader.readAsDataURL(file)
   }
 }
 

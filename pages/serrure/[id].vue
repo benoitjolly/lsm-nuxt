@@ -126,12 +126,46 @@
           
           <div v-if="serrure.planUrl" class="p-4 mt-2">
             <h4 class="text-sm font-medium text-gray-700 mb-2">Plan de la serrure</h4>
-            <img 
-              :src="serrure.planUrl" 
-              :alt="`Plan technique de la serrure ${serrure.designation || serrure.codeArticle}`" 
-              class="h-64 object-cover rounded-md mx-auto"
-              loading="lazy"
-            />
+            
+            <div class="flex flex-col items-center">
+              <!-- Image du plan (visible par défaut) -->
+              <img 
+                v-if="!imageLoadError"
+                :src="serrure.planUrl" 
+                :alt="`Plan technique de la serrure ${serrure.designation || serrure.codeArticle}`" 
+                class="h-64 object-cover rounded-md mx-auto cursor-pointer"
+                loading="lazy"
+                @error="handleImageError"
+                @click="openPlan"
+              />
+              
+              <!-- Bouton d'ouverture du plan dans un nouvel onglet (si l'image ne charge pas) -->
+             <div 
+                v-if="imageLoadError"
+                class="flex items-center gap-4 bg-gray-100 rounded-md p-4"
+              >
+                <!-- Bouton d'ouverture du plan -->
+                <button 
+                  @click="openPlan"
+                  class="cursor-pointer flex flex-col items-center hover:opacity-80 transition-opacity"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-indigo-600 mb-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                  </svg>
+                  <span class="text-sm text-gray-700">Voir le plan</span>
+                </button>
+                
+                <!-- Mini iframe pour aperçu -->
+                <div class="h-332 w-232 border border-gray-300 bg-white rounded-md overflow-hidden shadow-sm">
+                  <iframe 
+                    v-if="serrure?.planUrl"
+                    :src="serrure.planUrl" 
+                    class="w-full h-full border-0" 
+                    title="Aperçu du plan"
+                  ></iframe>
+                </div>
+              </div>
+            </div>
           </div>
           
           <dl class="divide-y divide-gray-200">
@@ -207,6 +241,49 @@
           </div>
         </div>
       </div>
+      
+      <!-- Modal d'affichage du plan -->
+      <div v-if="showPlanModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-5xl w-full h-5/6 flex flex-col">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900">Plan de la serrure</h3>
+            <button 
+              @click="showPlanModal = false"
+              class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600"
+              aria-label="Fermer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Iframe pour afficher directement le contenu -->
+          <div class="flex-1 bg-gray-100 rounded-md overflow-hidden">
+            <iframe 
+              v-if="serrure?.planUrl"
+              :src="serrure.planUrl" 
+              class="w-full h-full border-0" 
+              allowfullscreen
+            ></iframe>
+          </div>
+          
+          <div class="flex justify-end space-x-3 mt-4">
+            <button 
+              @click="showPlanModal = false"
+              class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            >
+              Fermer
+            </button>
+            <button 
+              @click="openPlanInNewTab"
+              class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              Ouvrir dans un nouvel onglet
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -237,6 +314,8 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const showForm = ref(false)
 const showDeleteModal = ref(false)
+const showPlanModal = ref(false)
+const imageLoadError = ref(false)
 const serrureService = useSerrureService()
 const { getSerrureById } = useSerrureService()
 const { getTypeSerrureById } = useTypeSerrureService()
@@ -345,125 +424,21 @@ const generateStructuredData = () => {
   return [productSchema, breadcrumbSchema]
 }
 
-// Fonction pour supprimer une serrure
-const handleDelete = async () => {
-  if (!serrure.value?.id) return
-  
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette serrure ?')) {
-    try {
-      await serrureService.deleteSerrure(serrure.value.id)
-      router.push('/')
-    } catch (error) {
-      console.error('Erreur lors de la suppression de la serrure:', error)
-    }
-  }
-}
-
-// Charger les données
+// Charger les détails de la serrure
 onMounted(async () => {
+  loading.value = true
+  error.value = null
+  
   try {
-    loading.value = true
-    const serrureData = await getSerrureById(serrureId.value)
-    serrure.value = serrureData
+    const id = route.params.id as string
+    serrure.value = await getSerrureById(id)
     
     if (serrure.value?.typeSerrureId) {
       typeSerrure.value = await getTypeSerrureById(serrure.value.typeSerrureId)
     }
-    
-    if (serrure.value) {
-      // Titre et description dynamiques pour SEO
-      const productName = serrure.value.designation || `Serrure ${serrure.value.codeArticle}`
-      const productType = serrure.value.typeSerrureNom || 'Professionnelle'
-      const title = `${productName} | Serrure ${productType} de Haute Qualité | ${siteName}`
-      
-      // Description SEO enrichie avec caractéristiques du produit et mots-clés
-      let description = `${productName} - Serrure professionnelle de haute qualité (Code: ${serrure.value.codeArticle})`
-      if (serrure.value.longueurDuCorpsMm) {
-        description += `, Longueur: ${serrure.value.longueurDuCorpsMm} mm`
-      }
-      if (serrure.value.typeSerrureNom) {
-        description += `, Type: ${serrure.value.typeSerrureNom}`
-      }
-      if (serrure.value.typeDeCle) {
-        description += `, Clé: ${serrure.value.typeDeCle}`
-      }
-      if (serrure.value.fixationSerrure) {
-        description += `, Fixation: ${serrure.value.fixationSerrure}`
-      }
-      description += `. Solution de sécurité fiable et durable pour vos installations.`
-      
-      // Mots-clés dynamiques basés sur les attributs du produit
-      let keywordsArray = [
-        'serrure professionnelle', 
-        'serrure haute qualité',
-        'serrure sécurisée',
-        serrure.value.codeArticle,
-        productName
-      ]
-      
-      if (serrure.value.typeSerrureNom) {
-        keywordsArray.push(serrure.value.typeSerrureNom)
-        keywordsArray.push(`serrure ${serrure.value.typeSerrureNom}`)
-      }
-      
-      if (serrure.value.typeDeCle) {
-        keywordsArray.push(serrure.value.typeDeCle)
-      }
-      
-      if (serrure.value.fixationSerrure) {
-        keywordsArray.push(`serrure ${serrure.value.fixationSerrure}`)
-      }
-      
-      const keywords = keywordsArray.join(', ')
-      
-      // Configuration SEO optimisée
-      useSeoMeta({
-        title: title,
-        ogTitle: title,
-        description: description,
-        ogDescription: description,
-        ogImage: mainImage.value,
-        twitterCard: 'summary_large_image',
-        ogType: getOgType('product'),
-        ogUrl: `${siteUrl}/serrure/${serrureId.value}`,
-        ogSiteName: siteName,
-        twitterTitle: title,
-        twitterDescription: description,
-        twitterImage: mainImage.value,
-        articleAuthor: formatAuthor(siteName),
-        articlePublishedTime: new Date().toISOString(),
-        articleModifiedTime: new Date().toISOString(),
-      })
-      
-      // Configuration avancée avec données structurées
-      useHead({
-        title: title,
-        htmlAttrs: {
-          lang: 'fr'
-        },
-        meta: [
-          { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
-          { name: 'keywords', content: keywords },
-          { name: 'author', content: siteName },
-          { property: 'og:locale', content: defaultLocale },
-          { name: 'googlebot', content: 'index, follow' }
-        ],
-        link: [
-          { rel: 'canonical', href: `${siteUrl}/serrure/${serrureId.value}` },
-          { rel: 'alternate', href: `${siteUrl}/serrure/${serrureId.value}`, hreflang: 'x-default' },
-          { rel: 'alternate', href: `${siteUrl}/serrure/${serrureId.value}`, hreflang: 'fr' }
-        ],
-        script: [
-          {
-            type: 'application/ld+json',
-            innerHTML: JSON.stringify(generateStructuredData())
-          }
-        ]
-      })
-    }
-  } catch (error) {
-    console.error('Erreur lors du chargement des données:', error)
-    serrure.value = null
+  } catch (err) {
+    console.error('Erreur lors du chargement de la serrure:', err)
+    error.value = 'Impossible de charger les détails de la serrure.'
   } finally {
     loading.value = false
   }
@@ -524,5 +499,29 @@ const confirmDelete = async () => {
     error.value = 'Erreur lors de la suppression'
     loading.value = false
   }
+}
+
+// Ouvrir la modale du plan
+const openPlan = () => {
+  if (!serrure.value?.planUrl) return
+  showPlanModal.value = true
+}
+
+// Ouvrir le plan dans un nouvel onglet
+const openPlanInNewTab = () => {
+  if (!serrure.value?.planUrl) return
+  
+  try {
+    window.open(serrure.value.planUrl, '_blank')
+    showPlanModal.value = false
+  } catch (err) {
+    console.error('Erreur lors de l\'ouverture du plan:', err)
+    error.value = 'Erreur lors de l\'ouverture du plan'
+  }
+}
+
+// Gérer l'erreur de chargement d'image
+const handleImageError = () => {
+  imageLoadError.value = true
 }
 </script> 
