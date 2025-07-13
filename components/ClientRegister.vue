@@ -2,6 +2,16 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
+        <!-- Logo LSM avec coins arrondis -->
+        <div class="flex justify-center mb-6">
+          <NuxtLink to="/">
+            <img 
+              src="~/assets/images/logo.png" 
+              alt="LSM Logo" 
+              class="w-16 h-16 rounded-xl bg-white shadow-md p-2 cursor-pointer hover:shadow-lg transition-shadow"
+            />
+          </NuxtLink>
+        </div>
         <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
           Créer un compte
         </h2>
@@ -9,42 +19,30 @@
       
       <form class="mt-8 space-y-6" @submit.prevent="handleRegister">
         <div class="rounded-md shadow-sm -space-y-px">
-          <div>
-            <label for="email" class="sr-only">Email</label>
-            <input
-              id="email"
-              v-model="email"
-              name="email"
-              type="email"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Email"
-            />
-          </div>
-          <div>
-            <label for="password" class="sr-only">Mot de passe</label>
-            <input
-              id="password"
-              v-model="password"
-              name="password"
-              type="password"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Mot de passe"
-            />
-          </div>
-          <div>
-            <label for="confirmPassword" class="sr-only">Confirmer le mot de passe</label>
-            <input
-              id="confirmPassword"
-              v-model="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Confirmer le mot de passe"
-            />
-          </div>
+          <Input
+            v-model="email"
+            name="email"
+            type="email"
+            placeholder="Email"
+            variant="rounded-top"
+            required
+          />
+          <Input
+            v-model="password"
+            name="password"
+            type="password"
+            placeholder="Mot de passe"
+            variant="no-rounded"
+            required
+          />
+          <Input
+            v-model="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirmer le mot de passe"
+            variant="rounded-bottom"
+            required
+          />
         </div>
 
         <div v-if="errorMessage" class="text-red-500 text-sm text-center">
@@ -100,7 +98,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import useAuth from '~/composables/useAuth'
 import { useFirebaseAuth } from '~/composables/useFirebaseAuth'
-import { Button, AuthLink, Separator } from '~/design-system/components'
+import { Button, AuthLink, Separator, Input } from '~/design-system/components'
 
 const props = defineProps({
   redirectTo: {

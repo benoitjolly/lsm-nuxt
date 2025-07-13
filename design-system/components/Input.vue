@@ -110,11 +110,11 @@ const inputClasses = computed(() => {
 
   // Border radius based on variant
   if (props.variant === 'rounded-top') {
-    baseClasses.push('rounded-t-md', 'rounded-b-none')
+    baseClasses.push('input-rounded-top')
   } else if (props.variant === 'rounded-bottom') {
-    baseClasses.push('rounded-b-md', 'rounded-t-none')
+    baseClasses.push('input-rounded-bottom')
   } else if (props.variant === 'no-rounded') {
-    baseClasses.push('rounded-none')
+    baseClasses.push('input-no-rounded')
   } else {
     baseClasses.push('rounded-md')
   }
@@ -133,4 +133,24 @@ const inputClasses = computed(() => {
 
   return baseClasses.join(' ')
 })
-</script> 
+</script>
+
+<style scoped>
+.input-rounded-top {
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-rounded-bottom {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+
+.input-no-rounded {
+  border-radius: 0;
+}
+</style> 
