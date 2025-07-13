@@ -8,6 +8,15 @@ import { designTokens } from './tokens.js'
 // Export des tokens pour utilisation directe
 export { designTokens }
 
+// Export des composants de layout
+export { Header, Footer } from './layout/index.js'
+
+// Export des classes sémantiques
+export { semanticClasses }
+
+// Export du CSS des classes utilitaires générées automatiquement
+export { default as generatedStyles } from './generated-styles.css'
+
 // Export par défaut pour faciliter l'import
 export default designTokens
 
@@ -101,7 +110,90 @@ export const generateCSSVariables = () => {
   return variables
 }
 
-// Export des utilitaires Tailwind personnalisés
+// Export des utilitaires CSS basés sur les tokens sémantiques
+export const semanticClasses = {
+  // === TYPOGRAPHIE ===
+  // Génération automatique des classes de typographie
+  ...Object.entries(designTokens.typography.styles).reduce((acc, [key, styles]) => {
+    acc[`.text-${key}`] = styles
+    return acc
+  }, {}),
+  
+  // === COULEURS SÉMANTIQUES ===
+  // Textes
+  '.text-primary': { color: designTokens.colors.semantic['text-primary'] },
+  '.text-secondary': { color: designTokens.colors.semantic['text-secondary'] },
+  '.text-tertiary': { color: designTokens.colors.semantic['text-tertiary'] },
+  '.text-disabled': { color: designTokens.colors.semantic['text-disabled'] },
+  '.text-inverse': { color: designTokens.colors.semantic['text-inverse'] },
+  '.text-accent': { color: designTokens.colors.semantic['text-accent'] },
+  '.text-success': { color: designTokens.colors.semantic['text-success'] },
+  '.text-warning': { color: designTokens.colors.semantic['text-warning'] },
+  '.text-error': { color: designTokens.colors.semantic['text-error'] },
+  
+  // Arrière-plans
+  '.bg-surface-primary': { backgroundColor: designTokens.colors.semantic['surface-primary'] },
+  '.bg-surface-secondary': { backgroundColor: designTokens.colors.semantic['surface-secondary'] },
+  '.bg-surface-tertiary': { backgroundColor: designTokens.colors.semantic['surface-tertiary'] },
+  '.bg-surface-accent': { backgroundColor: designTokens.colors.semantic['surface-accent'] },
+  '.bg-surface-accent-subtle': { backgroundColor: designTokens.colors.semantic['surface-accent-subtle'] },
+  '.bg-surface-success': { backgroundColor: designTokens.colors.semantic['surface-success'] },
+  '.bg-surface-success-subtle': { backgroundColor: designTokens.colors.semantic['surface-success-subtle'] },
+  '.bg-surface-warning': { backgroundColor: designTokens.colors.semantic['surface-warning'] },
+  '.bg-surface-warning-subtle': { backgroundColor: designTokens.colors.semantic['surface-warning-subtle'] },
+  '.bg-surface-error': { backgroundColor: designTokens.colors.semantic['surface-error'] },
+  '.bg-surface-error-subtle': { backgroundColor: designTokens.colors.semantic['surface-error-subtle'] },
+  
+  // Bordures
+  '.border-primary': { borderColor: designTokens.colors.semantic['border-primary'] },
+  '.border-secondary': { borderColor: designTokens.colors.semantic['border-secondary'] },
+  '.border-accent': { borderColor: designTokens.colors.semantic['border-accent'] },
+  '.border-success': { borderColor: designTokens.colors.semantic['border-success'] },
+  '.border-warning': { borderColor: designTokens.colors.semantic['border-warning'] },
+  '.border-error': { borderColor: designTokens.colors.semantic['border-error'] },
+  
+  // États interactifs
+  '.interactive-primary': { 
+    backgroundColor: designTokens.colors.semantic['interactive-primary'],
+    transition: `${designTokens.transitions.property.colors} ${designTokens.transitions.duration[150]} ${designTokens.transitions.timing.inOut}`,
+  },
+  '.interactive-primary:hover': { 
+    backgroundColor: designTokens.colors.semantic['interactive-primary-hover'],
+  },
+  '.interactive-primary:active': { 
+    backgroundColor: designTokens.colors.semantic['interactive-primary-active'],
+  },
+  '.interactive-secondary': { 
+    backgroundColor: designTokens.colors.semantic['interactive-secondary'],
+    transition: `${designTokens.transitions.property.colors} ${designTokens.transitions.duration[150]} ${designTokens.transitions.timing.inOut}`,
+  },
+  '.interactive-secondary:hover': { 
+    backgroundColor: designTokens.colors.semantic['interactive-secondary-hover'],
+  },
+  '.interactive-secondary:active': { 
+    backgroundColor: designTokens.colors.semantic['interactive-secondary-active'],
+  },
+  
+  // === OMBRES ===
+  '.shadow-sm': { boxShadow: designTokens.shadows.sm },
+  '.shadow-default': { boxShadow: designTokens.shadows.DEFAULT },
+  '.shadow-md': { boxShadow: designTokens.shadows.md },
+  '.shadow-lg': { boxShadow: designTokens.shadows.lg },
+  '.shadow-xl': { boxShadow: designTokens.shadows.xl },
+  
+  // === TRANSITIONS ===
+  '.transition-colors': { 
+    transition: `${designTokens.transitions.property.colors} ${designTokens.transitions.duration[150]} ${designTokens.transitions.timing.inOut}` 
+  },
+  '.transition-transform': { 
+    transition: `${designTokens.transitions.property.transform} ${designTokens.transitions.duration[150]} ${designTokens.transitions.timing.inOut}` 
+  },
+  '.transition-all': { 
+    transition: `${designTokens.transitions.property.all} ${designTokens.transitions.duration[150]} ${designTokens.transitions.timing.inOut}` 
+  },
+}
+
+// Export des utilitaires Tailwind personnalisés (legacy - à supprimer progressivement)
 export const tailwindUtilities = {
   // Couleurs personnalisées basées sur les tokens
   '.bg-ds-primary': { backgroundColor: designTokens.colors.primary[600] },

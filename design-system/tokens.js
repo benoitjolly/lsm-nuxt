@@ -67,6 +67,49 @@ export const designTokens = {
     white: '#ffffff',
     black: '#000000',
     transparent: 'transparent',
+
+    // === TOKENS SÉMANTIQUES DE COULEURS ===
+    semantic: {
+      // Textes
+      'text-primary': '#374151',      // neutral-700
+      'text-secondary': '#6b7280',    // neutral-500
+      'text-tertiary': '#9ca3af',     // neutral-400
+      'text-disabled': '#d1d5db',     // neutral-300
+      'text-inverse': '#ffffff',      // white
+      'text-accent': '#4f46e5',       // primary-600
+      'text-success': '#16a34a',      // success-600
+      'text-warning': '#a16207',      // warning-700
+      'text-error': '#dc2626',        // error-600
+      
+      // Arrière-plans
+      'surface-primary': '#ffffff',   // white
+      'surface-secondary': '#f9fafb', // neutral-50
+      'surface-tertiary': '#f3f4f6',  // neutral-100
+      'surface-accent': '#4f46e5',    // primary-600
+      'surface-accent-subtle': '#eef2ff', // primary-50
+      'surface-success': '#16a34a',   // success-600
+      'surface-success-subtle': '#f0fdf4', // success-50
+      'surface-warning': '#a16207',   // warning-700
+      'surface-warning-subtle': '#fffbeb', // warning-50
+      'surface-error': '#dc2626',     // error-600
+      'surface-error-subtle': '#fef2f2', // error-50
+      
+      // Bordures
+      'border-primary': '#e5e7eb',    // neutral-200
+      'border-secondary': '#d1d5db',  // neutral-300
+      'border-accent': '#4f46e5',     // primary-600
+      'border-success': '#16a34a',    // success-600
+      'border-warning': '#a16207',    // warning-700
+      'border-error': '#dc2626',      // error-600
+      
+      // États interactifs
+      'interactive-primary': '#4f46e5',     // primary-600
+      'interactive-primary-hover': '#4338ca', // primary-700
+      'interactive-primary-active': '#3730a3', // primary-800
+      'interactive-secondary': '#f3f4f6',   // neutral-100
+      'interactive-secondary-hover': '#e5e7eb', // neutral-200
+      'interactive-secondary-active': '#d1d5db', // neutral-300
+    },
   },
 
   // === TYPOGRAPHIE ===
@@ -101,6 +144,107 @@ export const designTokens = {
     // Familles de polices
     fontFamily: {
       sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+    },
+
+    // === TOKENS SÉMANTIQUES DE TYPOGRAPHIE ===
+    // Combinaisons prêtes à l'emploi
+    styles: {
+      // Titres
+      'heading-4xl': {
+        fontSize: '2.25rem', // 36px
+        fontWeight: '700',
+        lineHeight: '1.25',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'heading-3xl': {
+        fontSize: '1.875rem', // 30px
+        fontWeight: '700',
+        lineHeight: '1.25',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'heading-2xl': {
+        fontSize: '1.5rem', // 24px
+        fontWeight: '600',
+        lineHeight: '1.25',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'heading-xl': {
+        fontSize: '1.25rem', // 20px
+        fontWeight: '600',
+        lineHeight: '1.25',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'heading-lg': {
+        fontSize: '1.125rem', // 18px
+        fontWeight: '600',
+        lineHeight: '1.25',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      
+      // Corps de texte
+      'body-lg': {
+        fontSize: '1.125rem', // 18px
+        fontWeight: '400',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'body-base': {
+        fontSize: '1rem', // 16px
+        fontWeight: '400',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'body-sm': {
+        fontSize: '0.875rem', // 14px
+        fontWeight: '400',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      
+      // Labels et textes de support
+      'label-lg': {
+        fontSize: '1rem', // 16px
+        fontWeight: '500',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'label-base': {
+        fontSize: '0.875rem', // 14px
+        fontWeight: '500',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'label-sm': {
+        fontSize: '0.75rem', // 12px
+        fontWeight: '500',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      
+      // Textes fins
+      'caption': {
+        fontSize: '0.75rem', // 12px
+        fontWeight: '400',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+      'overline': {
+        fontSize: '0.75rem', // 12px
+        fontWeight: '500',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+      },
+      
+      // Nouveau token ajouté pour démonstration
+      'heading-hero': {
+        fontSize: '3rem', // 48px
+        fontWeight: '800',
+        lineHeight: '1.1',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        letterSpacing: '-0.025em',
+      },
     },
   },
 
