@@ -245,6 +245,28 @@ export const designTokens = {
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
         letterSpacing: '-0.025em',
       },
+      
+      // Liens d'authentification
+      'auth-link': {
+        fontSize: '0.875rem', // 14px
+        fontWeight: '500',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        color: '#4f46e5', // primary-600
+        textDecoration: 'none',
+        transition: 'color 0.15s ease-in-out',
+      },
+      
+      // Texte de séparateur
+      'separator-text': {
+        fontSize: '0.875rem', // 14px
+        fontWeight: '400',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        color: '#6b7280', // neutral-500
+        backgroundColor: '#f9fafb', // neutral-50
+        padding: '0 0.5rem',
+      },
     },
   },
 

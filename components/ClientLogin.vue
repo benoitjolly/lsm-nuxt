@@ -48,49 +48,48 @@
         </div>
 
         <div>
-          <button
+          <Button
             type="submit"
             :disabled="isLoading"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            variant="login"
+            size="base"
+            full-width
           >
             {{ isLoading ? 'Connexion...' : 'Se connecter' }}
-          </button>
+          </Button>
         </div>
 
         <div class="flex items-center justify-between">
           <div class="text-sm">
-            <NuxtLink to="/register" class="font-medium text-indigo-600 hover:text-indigo-500">
+            <AuthLink to="/register">
               Pas encore de compte ? S'inscrire
-            </NuxtLink>
+            </AuthLink>
           </div>
           <div class="text-sm">
-            <NuxtLink to="/reset-password" class="font-medium text-indigo-600 hover:text-indigo-500">
+            <AuthLink to="/reset-password">
               Mot de passe oublié ?
-            </NuxtLink>
+            </AuthLink>
           </div>
         </div>
 
-        <div class="mt-6">
-          <div class="relative">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-gray-300"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-              <span class="px-2 bg-gray-50 text-gray-500">Ou continuer avec</span>
-            </div>
-          </div>
+        <Separator>
+          Ou continuer avec
+        </Separator>
 
-          <div class="mt-6">
-            <button
-              type="button"
-              @click="handleGoogleLogin"
-              :disabled="isLoading"
-              class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
+        <div class="mt-6">
+          <Button
+            type="button"
+            @click="handleGoogleLogin"
+            :disabled="isLoading"
+            variant="google"
+            size="base"
+            full-width
+          >
+            <template #icon>
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 mr-2" />
-              Google
-            </button>
-          </div>
+            </template>
+            Google
+          </Button>
         </div>
       </form>
     </div>
@@ -102,6 +101,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import useAuth from '~/composables/useAuth'
 import { useFirebaseAuth } from '~/composables/useFirebaseAuth'
+import { Button, AuthLink, Separator } from '~/design-system/components'
 
 const props = defineProps({
   redirectTo: {
