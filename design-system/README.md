@@ -2,6 +2,35 @@
 
 Un design system complet basé sur des tokens sémantiques pour une approche professionnelle et maintenable.
 
+## 📦 Composants disponibles
+
+### Interface utilisateur
+- **Button**: Boutons avec variantes (primary, secondary, outline, login, google, danger)
+- **Input**: Champs de saisie avec validation et styles cohérents
+- **SearchInput**: Input de recherche avec icône intégrée
+- **Badge**: Badges colorés pour tags et statuts
+- **Avatar**: Images de profil avec fallback automatique
+
+### Layout et conteneurs
+- **Card**: Conteneurs avec header/footer et shadow
+- **Modal**: Modales avec overlay et gestion des actions
+- **Alert**: Messages d'alerte (success, warning, error, info)
+
+### Données et navigation
+- **Table**: Tableau agnostique avec formatage automatique (date, currency, boolean, etc.)
+- **Heading**: Titres H1-H6 avec tailles automatiques
+- **AuthLink**: Liens spécialisés pour l'authentification
+- **Separator**: Séparateurs avec texte centré
+- **DescriptionList**: Listes de descriptions avec séparateurs
+
+### Utilisation des composants
+
+```vue
+<script setup>
+import { Table, Button, Badge } from '~/design-system/components'
+</script>
+```
+
 ## 🤖 Génération automatique des classes
 
 Les classes CSS sont **générées automatiquement** à partir des tokens définis dans `tokens.js`.
