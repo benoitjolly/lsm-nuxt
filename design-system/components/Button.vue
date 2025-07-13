@@ -17,7 +17,7 @@ const props = defineProps({
   variant: {
     type: String,
     default: 'primary',
-    validator: (value) => ['primary', 'secondary', 'outline', 'login', 'google'].includes(value)
+    validator: (value) => ['primary', 'secondary', 'outline', 'login', 'google', 'danger'].includes(value)
   },
   size: {
     type: String,
@@ -86,6 +86,16 @@ const buttonClasses = computed(() => {
       'bg-white',
       'hover:bg-gray-50',
       'focus:ring-indigo-500'
+    )
+  } else if (props.variant === 'danger') {
+    baseClasses.push(
+      'border',
+      'border-transparent',
+      'shadow-sm',
+      'text-white',
+      'bg-red-600',
+      'hover:bg-red-700',
+      'focus:ring-red-500'
     )
   }
 

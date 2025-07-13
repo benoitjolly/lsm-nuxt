@@ -7,6 +7,11 @@ export { default as Button } from './Button.vue'
 export { default as Input } from './Input.vue'
 export { default as AuthLink } from './AuthLink.vue'
 export { default as Separator } from './Separator.vue'
+export { default as Card } from './Card.vue'
+export { default as CardContent } from './CardContent.vue'
+export { default as Heading } from './Heading.vue'
+export { default as DescriptionList } from './DescriptionList.vue'
+export { default as DescriptionListItem } from './DescriptionListItem.vue'
 
 // Export par défaut pour faciliter l'import
 export default {
@@ -14,4 +19,9 @@ export default {
   Input: () => import('./Input.vue'),
   AuthLink: () => import('./AuthLink.vue'),
   Separator: () => import('./Separator.vue'),
+  Card: () => import('./Card.vue'),
+  CardContent: () => import('./CardContent.vue'),
+  Heading: () => import('./Heading.vue'),
+  DescriptionList: () => import('./DescriptionList.vue'),
+  DescriptionListItem: () => import('./DescriptionListItem.vue'),
 } 
