@@ -19,6 +19,7 @@ export { default as Avatar } from './Avatar.vue'
 export { default as Modal } from './Modal.vue'
 export { default as Alert } from './Alert.vue'
 export { default as Tabs } from './Tabs.vue'
+export { default as ThemeToggle } from './ThemeToggle.vue'
 
 // Export par défaut pour faciliter l'import
 export default {
@@ -38,4 +39,5 @@ export default {
   Modal: () => import('./Modal.vue'),
   Alert: () => import('./Alert.vue'),
   Tabs: () => import('./Tabs.vue'),
+  ThemeToggle: () => import('./ThemeToggle.vue'),
 } 

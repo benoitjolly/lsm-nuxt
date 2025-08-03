@@ -134,6 +134,36 @@
             </Card>
           </ComponentSection>
 
+          <ComponentSection title="ThemeToggle" description="Basculer entre modes light et dark">
+            <div class="space-y-6">
+              <div class="space-y-4">
+                <h4 class="font-semibold text-neutral-700">Tailles</h4>
+                <div class="flex flex-wrap items-center gap-4">
+                  <ThemeToggle size="sm" />
+                  <ThemeToggle size="base" />
+                  <ThemeToggle size="lg" />
+                </div>
+              </div>
+              
+              <div class="space-y-4">
+                <h4 class="font-semibold text-neutral-700">Variantes</h4>
+                <div class="flex flex-wrap items-center gap-4">
+                  <ThemeToggle variant="subtle" />
+                  <ThemeToggle variant="outlined" />
+                  <ThemeToggle variant="ghost" />
+                </div>
+              </div>
+              
+              <div class="space-y-4">
+                <h4 class="font-semibold text-neutral-700">Avec label</h4>
+                <div class="flex flex-wrap items-center gap-4">
+                  <ThemeToggle show-label />
+                  <ThemeToggle show-label variant="outlined" />
+                </div>
+              </div>
+            </div>
+          </ComponentSection>
+
           <ComponentSection title="AuthLink" description="Liens d'authentification stylisés">
             <div class="space-y-2">
               <AuthLink href="/login">Se connecter</AuthLink>
@@ -240,7 +270,8 @@ import {
   DescriptionList, 
   DescriptionListItem, 
   Table, 
-  Modal 
+  Modal,
+  ThemeToggle
 } from '~/design-system/components'
 
 // Définir le middleware d'administration

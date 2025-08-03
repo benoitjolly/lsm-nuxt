@@ -1,0 +1,154 @@
+{
+  "themes": {
+    "light": {
+      "surface": {
+        "primary": "base.white",
+        "secondary": "gray.50",
+        "tertiary": "gray.100",
+        "inverse": "gray.900"
+      },
+      "text": {
+        "primary": "gray.900",
+        "secondary": "gray.700",
+        "tertiary": "gray.500",
+        "disabled": "gray.300",
+        "inverse": "base.white"
+      },
+      "border": {
+        "primary": "gray.200",
+        "secondary": "gray.300",
+        "tertiary": "gray.400"
+      },
+      "elevation": {
+        "shadow": "rgba(0, 0, 0, 0.1)",
+        "overlay": "rgba(0, 0, 0, 0.5)"
+      }
+    },
+    "dark": {
+      "surface": {
+        "primary": "gray.900",
+        "secondary": "gray.800",
+        "tertiary": "gray.700",
+        "inverse": "base.white"
+      },
+      "text": {
+        "primary": "gray.100",
+        "secondary": "gray.300",
+        "tertiary": "gray.400",
+        "disabled": "gray.600",
+        "inverse": "gray.900"
+      },
+      "border": {
+        "primary": "gray.700",
+        "secondary": "gray.600",
+        "tertiary": "gray.500"
+      },
+      "elevation": {
+        "shadow": "rgba(0, 0, 0, 0.3)",
+        "overlay": "rgba(0, 0, 0, 0.8)"
+      }
+    }
+  },
+  "semantic": {
+    "light": {
+      "primary": {
+        "base": "indigo.600",
+        "hover": "indigo.700",
+        "active": "indigo.800",
+        "subtle": "indigo.50",
+        "muted": "indigo.100",
+        "contrast": "base.white"
+      },
+      "secondary": {
+        "base": "gray.600",
+        "hover": "gray.700", 
+        "active": "gray.800",
+        "subtle": "gray.50",
+        "muted": "gray.100",
+        "contrast": "base.white"
+      },
+      "success": {
+        "base": "green.600",
+        "hover": "green.700",
+        "active": "green.800", 
+        "subtle": "green.50",
+        "muted": "green.100",
+        "contrast": "base.white"
+      },
+      "warning": {
+        "base": "yellow.600",
+        "hover": "yellow.700",
+        "active": "yellow.800",
+        "subtle": "yellow.50", 
+        "muted": "yellow.100",
+        "contrast": "gray.900"
+      },
+      "error": {
+        "base": "red.600",
+        "hover": "red.700",
+        "active": "red.800",
+        "subtle": "red.50",
+        "muted": "red.100", 
+        "contrast": "base.white"
+      },
+      "info": {
+        "base": "blue.600",
+        "hover": "blue.700",
+        "active": "blue.800",
+        "subtle": "blue.50",
+        "muted": "blue.100",
+        "contrast": "base.white"
+      }
+    },
+    "dark": {
+      "primary": {
+        "base": "indigo.400",
+        "hover": "indigo.300",
+        "active": "indigo.200",
+        "subtle": "indigo.950",
+        "muted": "indigo.900",
+        "contrast": "gray.900"
+      },
+      "secondary": {
+        "base": "gray.400",
+        "hover": "gray.300",
+        "active": "gray.200", 
+        "subtle": "gray.800",
+        "muted": "gray.700",
+        "contrast": "gray.900"
+      },
+      "success": {
+        "base": "green.400",
+        "hover": "green.300",
+        "active": "green.200",
+        "subtle": "green.950",
+        "muted": "green.900",
+        "contrast": "gray.900"
+      },
+      "warning": {
+        "base": "yellow.400",
+        "hover": "yellow.300", 
+        "active": "yellow.200",
+        "subtle": "yellow.950",
+        "muted": "yellow.900",
+        "contrast": "gray.900"
+      },
+      "error": {
+        "base": "red.400",
+        "hover": "red.300",
+        "active": "red.200",
+        "subtle": "red.950",
+        "muted": "red.900",
+        "contrast": "gray.900"
+      },
+      "info": {
+        "base": "blue.400",
+        "hover": "blue.300",
+        "active": "blue.200",
+        "subtle": "blue.950",
+        "muted": "blue.900",
+        "contrast": "gray.900"
+      }
+    }
+  }
+}
