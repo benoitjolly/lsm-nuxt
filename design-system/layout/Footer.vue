@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-surface-primary rounded-xl mx-4 mb-4 shadow-md">
+  <footer class="bg-surface-primary rounded-xl shadow-md">
     <div class="py-6 px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <!-- Logo et nom de l'entreprise -->
@@ -46,3 +46,11 @@ const isDev = computed(() => {
   return process.env.NODE_ENV === 'development'
 })
 </script> 
+
+<style lang="css" scoped>
+footer {
+  margin-bottom: 2rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+</style>

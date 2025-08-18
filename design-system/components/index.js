@@ -18,6 +18,7 @@ export { default as Badge } from './Badge.vue'
 export { default as Avatar } from './Avatar.vue'
 export { default as Modal } from './Modal.vue'
 export { default as Alert } from './Alert.vue'
+export { default as Tabs } from './Tabs.vue'
 
 // Export par défaut pour faciliter l'import
 export default {
@@ -36,4 +37,5 @@ export default {
   Avatar: () => import('./Avatar.vue'),
   Modal: () => import('./Modal.vue'),
   Alert: () => import('./Alert.vue'),
+  Tabs: () => import('./Tabs.vue'),
 } 
