@@ -16,8 +16,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
 
   routeRules: {
-    '/serrure': { ssr: false }, // Désactiver le SSR pour les routes protégées
-    '/serrure/**': { ssr: false },
+    '/serrure/**': { ssr: false }, // Garder pour les pages de détail de serrures
     '/admin/**': { ssr: false },
     '/profile': { ssr: false },
     '/login': { ssr: false },

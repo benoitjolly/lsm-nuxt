@@ -217,13 +217,13 @@ const cancelSerrureForm = () => {
   selectedSerrure.value = undefined
 }
 
-const handleSerrureFormSubmit = async (serrure: Serrure, photoFile?: File, planFile?: File) => {
+const handleSerrureFormSubmit = async (serrure: Serrure, photoFile?: File, planFile?: File, autreFile?: File) => {
   try {
     loadingSerrures.value = true
     
     if (serrure.id) {
       // Mise à jour
-      await serrureService.updateSerrure(serrure.id, serrure, photoFile, planFile)
+      await serrureService.updateSerrure(serrure.id, serrure, photoFile, planFile, autreFile)
       
       // Mettre à jour la liste locale
       const index = serrures.value.findIndex(s => s.id === serrure.id)
@@ -232,7 +232,7 @@ const handleSerrureFormSubmit = async (serrure: Serrure, photoFile?: File, planF
       }
     } else {
       // Création
-      const id = await serrureService.addSerrure(serrure, photoFile, planFile)
+      const id = await serrureService.addSerrure(serrure, photoFile, planFile, autreFile)
       serrure.id = id
       serrures.value.push(serrure)
     }

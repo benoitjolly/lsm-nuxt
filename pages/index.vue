@@ -8,13 +8,7 @@
         </p>
       </div>
       
-      <ClientOnly>
-        <div v-if="isLoggedIn && isModerator" class="mt-4 sm:mt-0">
-          <NuxtLink to="/serrure" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
-            Gestion des serrures
-          </NuxtLink>
-        </div>
-      </ClientOnly>
+
     </div>
     
     <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
@@ -77,7 +71,7 @@
                       <h3 class="text-sm font-medium text-gray-900 group-hover:text-indigo-600">
                         {{ serrure.designation || 'Serrure' }}
                       </h3>
-                      <p class="mt-1 text-sm text-gray-500">{{ serrure.codeArticle }}</p>
+                      <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ serrure.codeArticle }}</p>
                       <p class="mt-2 text-sm font-medium text-gray-900">{{ serrure.longueurDuCorpsMm }} mm</p>
                     </div>
                   </NuxtLink>
@@ -118,7 +112,7 @@
                       <h3 class="text-sm text-gray-700 font-medium group-hover:text-indigo-600">
                         {{ serrure.designation || 'Serrure' }}
                       </h3>
-                      <p class="mt-1 text-sm text-gray-500">{{ serrure.codeArticle }}</p>
+                      <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ serrure.codeArticle }}</p>
                     </div>
                     
                     <p class="text-sm font-medium text-gray-900">{{ serrure.longueurDuCorpsMm }} mm</p>
@@ -139,7 +133,7 @@
         </div>
 
         <template #fallback>
-          <div class="px-4 py-5 sm:px-6 text-center py-12">
+          <div class="px-4 sm:px-6 text-center py-12">
             <p class="text-gray-500 text-lg">Chargement des données...</p>
           </div>
         </template>

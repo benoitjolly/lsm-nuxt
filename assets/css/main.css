@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design System avec support des thèmes */
+@import url('../design-system/theme.css');
+
 /* Custom styles */
 @layer base {
   body {

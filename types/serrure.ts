@@ -6,6 +6,7 @@ export interface Serrure {
   typeDeCle?: string;
   designation?: string;
   longueurDuCorpsMm: number;
+  diametre?: number;
   course?: string;
   sens?: string;
   sortieDeCle?: string;
@@ -14,4 +15,5 @@ export interface Serrure {
   typeDeCame: string;
   photoUrl?: string;
   planUrl?: string;
+  autreFileUrl?: string;
 } 

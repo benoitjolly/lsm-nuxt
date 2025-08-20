@@ -1,16 +1,16 @@
 <template>
   <div>
     <div class="mb-6 flex items-center">
-      <NuxtLink 
-        to="/" 
+      <button 
+        @click="goBack"
         class="inline-flex items-center text-indigo-600 hover:text-indigo-900"
-        aria-label="Retour à la page d'accueil"
+        aria-label="Retour à la page précédente"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        Retour à l'accueil
-      </NuxtLink>
+        Retour
+      </button>
     </div>
     
     <div v-if="loading" class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 p-6 flex justify-center items-center">
@@ -38,19 +38,11 @@
     </div>
     
     <div v-else>
-      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ typeSerrure.nom }}</h1>
-          <p v-if="typeSerrure.description" class="text-sm text-gray-500 max-w-3xl">
-            {{ typeSerrure.description }}
-          </p>
-        </div>
-        
-        <div v-if="isModerator" class="mt-4 sm:mt-0">
-          <NuxtLink to="/serrure" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
-            Administration
-          </NuxtLink>
-        </div>
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ typeSerrure.nom }}</h1>
+        <p v-if="typeSerrure.description" class="text-sm text-gray-500 max-w-3xl">
+          {{ typeSerrure.description }}
+        </p>
       </div>
       
       <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
@@ -79,7 +71,7 @@
                     <h3 class="text-sm text-gray-700 font-medium group-hover:text-indigo-600">
                       {{ serrure.designation || 'Serrure' }}
                     </h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ serrure.codeArticle }}</p>
+                    <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ serrure.codeArticle }}</p>
                   </div>
                   
                   <p class="text-sm font-medium text-gray-900">{{ serrure.longueurDuCorpsMm }} mm</p>
@@ -100,7 +92,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { Serrure } from '~/types/serrure'
 import type { TypeSerrure } from '~/types/typeSerrure'
 import { useSerrureService } from '~/services/serrureService'
@@ -116,12 +108,13 @@ definePageMeta({
 })
 
 const route = useRoute()
+const router = useRouter()
 const serrures = ref<Serrure[]>([])
 const typeSerrure = ref<TypeSerrure | null>(null)
 const loading = ref(true)
 const serrureService = useSerrureService()
 const typeSerrureService = useTypeSerrureService()
-const { isLoggedIn, isAdmin, isModerator } = useAuth()
+const { isLoggedIn, isAdmin } = useAuth()
 
 // Configuration SEO
 const { 
@@ -278,6 +271,11 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+// Fonction pour revenir à la page précédente
+const goBack = () => {
+  router.back()
+}
 </script>
 
 <style>

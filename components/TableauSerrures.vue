@@ -42,21 +42,22 @@
         Aucune serrure trouvée. {{ canEdit ? 'Ajoutez-en une nouvelle !' : '' }}
       </div>
       
-      <div v-else class="table-container">
+      <div v-else class="table-container" ref="tableContainer" @scroll="handleScroll">
         <table class="table">
           <thead class="table-header bg-surface-secondary">
             <tr>
-              <th class="col-photo sticky-photo-header">Photo</th>
+              <th :class="['col-photo', 'sticky-photo-header', { 'show-shadow': canScrollRight }]">Photo</th>
               <th class="col-plan hidden-mobile">Plan</th>
               <th class="col-code">Code Article</th>
               <th class="col-designation hidden-mobile">Désignation</th>
               <th class="col-type-cle hidden-small">Type de Clé</th>
               <th class="col-longueur hidden-large">Longueur</th>
+              <th class="col-diametre hidden-large">Diamètre</th>
               <th class="col-course hidden-large">Course</th>
               <th class="col-sens hidden-xlarge">Sens</th>
               <th class="col-type-came hidden-xlarge">Type de Came</th>
               <th class="col-type-serrure hidden-xlarge">Type de Serrure</th>
-              <th v-if="canEdit" class="col-actions sticky-actions-header">
+              <th v-if="canEdit" :class="['col-actions', 'sticky-actions-header', { 'show-shadow': canScrollLeft }]">
                 <span class="sr-only">Actions</span>
               </th>
             </tr>
@@ -65,7 +66,7 @@
           <tbody class="table-body">
             <tr v-for="serrure in filteredSerrures" :key="serrure.id" class="table-row">
               <!-- Photo -->
-              <td class="cell-photo sticky-photo-cell">
+              <td :class="['cell-photo', 'sticky-photo-cell', { 'show-shadow': canScrollRight }]">
                 <div v-if="serrure.photoUrl" class="photo-container">
                   <img 
                     :src="serrure.photoUrl" 
@@ -114,7 +115,7 @@
               
               <!-- Code Article -->
               <td class="cell-code">
-                <div class="text-label-base text-primary">{{ serrure.codeArticle }}</div>
+                <div class="text-label-base text-primary whitespace-pre-line">{{ serrure.codeArticle }}</div>
               </td>
               
               <!-- Désignation -->
@@ -130,6 +131,11 @@
               <!-- Longueur -->
               <td class="cell-longueur hidden-large">
                 <span class="text-body-small text-secondary">{{ serrure.longueurDuCorpsMm }} mm</span>
+              </td>
+              
+              <!-- Diamètre -->
+              <td class="cell-diametre hidden-large">
+                <span class="text-body-small text-secondary">{{ serrure.diametre ? `${serrure.diametre} mm` : '-' }}</span>
               </td>
               
               <!-- Course -->
@@ -153,7 +159,7 @@
               </td>
               
               <!-- Actions -->
-              <td v-if="canEdit" class="cell-actions sticky-actions-cell">
+              <td v-if="canEdit" :class="['cell-actions', 'sticky-actions-cell', { 'show-shadow': canScrollLeft }]">
                 <div class="actions-container">
                   <Button
                     v-if="showViewButton"
@@ -225,7 +231,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ref, computed, defineProps, defineEmits, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import type { Serrure } from '~/types/serrure'
 import { 
   Button, 
@@ -267,6 +273,9 @@ const searchQuery = ref('')
 const showPlanModal = ref(false)
 const currentPlanUrl = ref<string | null>(null)
 const imageLoadErrors = ref<Record<string, boolean>>({})
+const tableContainer = ref<HTMLElement | null>(null)
+const canScrollLeft = ref(false)
+const canScrollRight = ref(false)
 
 // Serrures filtrées par la recherche sur toutes les colonnes
 const filteredSerrures = computed(() => {
@@ -290,6 +299,9 @@ const filteredSerrures = computed(() => {
       // Longueur (avec ou sans "mm")
       matchesQuery(serrure.longueurDuCorpsMm) ||
       matchesQuery(`${serrure.longueurDuCorpsMm} mm`) ||
+      // Diamètre (avec ou sans "mm")
+      matchesQuery(serrure.diametre) ||
+      (serrure.diametre && matchesQuery(`${serrure.diametre} mm`)) ||
       // Course
       matchesQuery(serrure.course) ||
       // Sens
@@ -330,6 +342,33 @@ const openPlanInNewTab = () => {
     console.error('Erreur lors de l\'ouverture du plan:', err)
   }
 }
+
+// Fonction simple pour vérifier le scroll
+const updateScrollShadows = () => {
+  if (!tableContainer.value) return
+  
+  const { scrollLeft, scrollWidth, clientWidth } = tableContainer.value
+  
+  // Simple : peut-on scroller dans chaque direction ?
+  canScrollRight.value = scrollLeft > 5  // 5px de tolérance
+  canScrollLeft.value = scrollLeft < (scrollWidth - clientWidth - 5)  // 5px de tolérance
+}
+
+// Event listener pour le scroll
+const handleScroll = () => {
+  updateScrollShadows()
+}
+
+onMounted(async () => {
+  await nextTick()
+  updateScrollShadows()
+})
+
+// Watcher simple pour les changements de données
+watch([() => props.serrures, filteredSerrures], async () => {
+  await nextTick()
+  updateScrollShadows()
+})
 </script>
 
 <style scoped>
@@ -633,9 +672,9 @@ const openPlanInNewTab = () => {
   background-color: #ffffff; /* bg-white pour les cellules */
 }
 
-/* Effet d'ombre pour indiquer que c'est sticky */
-.sticky-photo-header::after,
-.sticky-photo-cell::after {
+/* Effet d'ombre pour indiquer que c'est sticky - conditionnel */
+.sticky-photo-header.show-shadow::after,
+.sticky-photo-cell.show-shadow::after {
   content: '';
   position: absolute;
   right: -8px;
@@ -661,9 +700,9 @@ const openPlanInNewTab = () => {
   background-color: #ffffff; /* bg-white pour les cellules */
 }
 
-/* Effet d'ombre pour indiquer que c'est sticky */
-.sticky-actions-header::before,
-.sticky-actions-cell::before {
+/* Effet d'ombre pour indiquer que c'est sticky - conditionnel */
+.sticky-actions-header.show-shadow::before,
+.sticky-actions-cell.show-shadow::before {
   content: '';
   position: absolute;
   left: -8px;

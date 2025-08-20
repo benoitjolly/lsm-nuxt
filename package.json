@@ -8,7 +8,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "build:design-system": "node design-system/generate-styles.js",
-    "watch:design-system": "node design-system/watch-and-build.js"
+    "watch:design-system": "node design-system/watch-and-build.js",
+    "tokens:build": "cd design-system && node generate-css-vars.js"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
