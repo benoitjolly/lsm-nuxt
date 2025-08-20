@@ -4,17 +4,17 @@
     
     <template #fallback>
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">Mon Profil</h1>
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-          <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
+        <Heading level="1" class="mb-6">Mon Profil</Heading>
+        <Card class="mb-6">
+          <template #header>
+            <Heading level="3">
               Chargement des informations...
-            </h3>
+            </Heading>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">
               Veuillez patienter
             </p>
-          </div>
-        </div>
+          </template>
+        </Card>
       </div>
     </template>
   </ClientOnly>
@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { Card, Heading } from '~/design-system/components'
 
 // Définir cette page comme publique (pas besoin de middleware)
 // Le composant ClientProfile gèrera lui-même la redirection si nécessaire

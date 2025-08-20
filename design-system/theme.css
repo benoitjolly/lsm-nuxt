@@ -1,0 +1,157 @@
+/**
+ * Design System - CSS Variables et Thèmes
+ * Import automatique de toutes les variables CSS et support des thèmes
+ */
+
+@import url('./css-variables.css');
+
+/**
+ * Configuration de base pour le body et html
+ */
+html {
+  /* Définit la transition pour un changement de thème fluide */
+  transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
+}
+
+body {
+  /* Utilise les variables de thème pour les couleurs de base */
+  color: var(--theme-text-primary);
+  background-color: var(--theme-surface-primary);
+  
+  /* Police système par défaut */
+  font-family: var(--font-family-sans, Inter, system-ui, -apple-system, sans-serif);
+  
+  /* Lissage des polices */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/**
+ * Sélections de texte
+ */
+::selection {
+  background-color: var(--semantic-primary-subtle);
+  color: var(--semantic-primary-contrast);
+}
+
+::-moz-selection {
+  background-color: var(--semantic-primary-subtle);
+  color: var(--semantic-primary-contrast);
+}
+
+/**
+ * Focus visible amélioré
+ */
+:focus-visible {
+  outline: 2px solid var(--semantic-primary-base);
+  outline-offset: 2px;
+}
+
+/**
+ * Scrollbars (WebKit)
+ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--theme-surface-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-border-secondary);
+  border-radius: var(--border-radius-md);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-border-tertiary);
+}
+
+/**
+ * Mode dark automatique pour les préférences système
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+  }
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/**
+ * Améliorations pour les images en mode dark
+ */
+[data-theme="dark"] img:not([data-theme-ignore]) {
+  filter: brightness(0.9);
+}
+
+/**
+ * Classes utilitaires pour forcer un thème spécifique
+ */
+.theme-light {
+  color: var(--color-gray-900) !important;
+  background-color: var(--color-base-white) !important;
+}
+
+.theme-dark {
+  color: var(--color-gray-100) !important;
+  background-color: var(--color-gray-900) !important;
+}
+
+/**
+ * Variables CSS supplémentaires pour les composants
+ */
+:root {
+  /* Espacements sémantiques raccourcis */
+  --space-xs: var(--spacing-2);
+  --space-sm: var(--spacing-4);
+  --space-md: var(--spacing-6);
+  --space-lg: var(--spacing-8);
+  --space-xl: var(--spacing-12);
+  
+  /* Rayons de bordure raccourcis */
+  --radius-sm: var(--border-radius-sm);
+  --radius-md: var(--border-radius-md);
+  --radius-lg: var(--border-radius-lg);
+  --radius-full: var(--border-radius-full);
+  
+  /* Durées de transition raccourcies */
+  --duration-fast: var(--transition-duration-150);
+  --duration-normal: var(--transition-duration-200);
+  --duration-slow: var(--transition-duration-300);
+}
+
+/**
+ * Classes d'animation pour les transitions de thème
+ */
+.theme-transition {
+  transition: 
+    color var(--duration-normal) ease-in-out,
+    background-color var(--duration-normal) ease-in-out,
+    border-color var(--duration-normal) ease-in-out,
+    box-shadow var(--duration-normal) ease-in-out;
+}
+
+/**
+ * Mode réduit d'animation (respect de prefers-reduced-motion)
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto !important;
+  }
+}

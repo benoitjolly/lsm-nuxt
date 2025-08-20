@@ -17,7 +17,8 @@ export const useSerrureService = () => {
       deleteSerrure: async () => {},
       searchSerruresByCode: async () => [] as Serrure[],
       uploadPhoto: async () => "",
-      uploadPlan: async () => ""
+      uploadPlan: async () => "",
+      uploadAutreFile: async () => ""
     }
   }
 
@@ -28,7 +29,7 @@ export const useSerrureService = () => {
     console.error('Firebase n\'est pas correctement initialisé')
   }
 
-  const addSerrure = async (serrure: Serrure, photoFile?: File, planFile?: File): Promise<string> => {
+  const addSerrure = async (serrure: Serrure, photoFile?: File, planFile?: File, autreFile?: File): Promise<string> => {
     try {
       if (!db) throw new Error('Firebase n\'est pas initialisé')
       
@@ -42,6 +43,11 @@ export const useSerrureService = () => {
       if (planFile) {
         const planUrl = await uploadPlan(docRef.id, planFile)
         await updateDoc(docRef, { planUrl })
+      }
+      
+      if (autreFile) {
+        const autreFileUrl = await uploadAutreFile(docRef.id, autreFile)
+        await updateDoc(docRef, { autreFileUrl })
       }
       
       return docRef.id
@@ -74,6 +80,19 @@ export const useSerrureService = () => {
       return await getDownloadURL(storageRef)
     } catch (error) {
       console.error('Erreur lors du téléchargement du plan:', error)
+      throw error
+    }
+  }
+
+  const uploadAutreFile = async (serrureId: string, autreFile: File): Promise<string> => {
+    try {
+      if (!storage) throw new Error('Firebase Storage n\'est pas initialisé')
+      
+      const storageRef = ref(storage, `${COLLECTION_NAME}/${serrureId}/autre-file`)
+      await uploadBytes(storageRef, autreFile)
+      return await getDownloadURL(storageRef)
+    } catch (error) {
+      console.error('Erreur lors du téléchargement de l\'autre fichier:', error)
       throw error
     }
   }
@@ -113,7 +132,7 @@ export const useSerrureService = () => {
   }
 
   
-  const updateSerrure = async (id: string, serrure: Partial<Serrure>, photoFile?: File, planFile?: File): Promise<void> => {
+  const updateSerrure = async (id: string, serrure: Partial<Serrure>, photoFile?: File, planFile?: File, autreFile?: File): Promise<void> => {
     try {
       if (!db) throw new Error('Firebase n\'est pas initialisé')
       
@@ -127,6 +146,11 @@ export const useSerrureService = () => {
       if (planFile) {
         const planUrl = await uploadPlan(id, planFile)
         serrure.planUrl = planUrl
+      }
+      
+      if (autreFile) {
+        const autreFileUrl = await uploadAutreFile(id, autreFile)
+        serrure.autreFileUrl = autreFileUrl
       }
       
       await updateDoc(docRef, serrure)
@@ -158,6 +182,15 @@ export const useSerrureService = () => {
           await deleteObject(planStorageRef)
         } catch (e) {
           console.warn('Impossible de supprimer le plan', e)
+        }
+      }
+      
+      if (serrure?.autreFileUrl) {
+        const autreFileStorageRef = ref(storage, `${COLLECTION_NAME}/${id}/autre-file`)
+        try {
+          await deleteObject(autreFileStorageRef)
+        } catch (e) {
+          console.warn('Impossible de supprimer l\'autre fichier', e)
         }
       }
       
@@ -198,6 +231,7 @@ export const useSerrureService = () => {
     deleteSerrure,
     searchSerruresByCode,
     uploadPhoto,
-    uploadPlan
+    uploadPlan,
+    uploadAutreFile
   }
 } 

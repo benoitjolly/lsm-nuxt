@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System LSM - Exemple</title>
+    <link rel="stylesheet" href="./generated-styles.css">
+    <style>
+        body { 
+            margin: 0; 
+            padding: 2rem; 
+            background: linear-gradient(135deg, #f9fafb 0%, #eef2ff 100%);
+        }
+        .demo-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+        }
+        .demo-section { 
+            margin-bottom: 3rem; 
+            padding: 2rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        
+        <!-- Section Typographie -->
+        <div class="demo-section">
+            <h2 class="text-heading-2xl text-primary">🎨 Typographie générée automatiquement</h2>
+            
+            <!-- Notre nouveau token héro ! -->
+            <h1 class="text-heading-hero text-accent">Titre héroïque</h1>
+            <p class="text-caption text-secondary">↑ Nouveau token ajouté : heading-hero (3rem, weight 800)</p>
+            
+            <h2 class="text-heading-3xl text-primary">Titre principal</h2>
+            <h3 class="text-heading-2xl text-primary">Titre de page</h3>
+            <h4 class="text-heading-xl text-primary">Titre de section</h4>
+            <h5 class="text-heading-lg text-primary">Sous-titre</h5>
+            
+            <p class="text-body-lg text-secondary">Corps de texte large - Lorem ipsum dolor sit amet consectetur.</p>
+            <p class="text-body-base text-secondary">Corps de texte standard - Lorem ipsum dolor sit amet consectetur adipisicing.</p>
+            <p class="text-body-sm text-tertiary">Corps de texte petit - Lorem ipsum dolor sit amet.</p>
+            
+            <div style="margin-top: 1rem;">
+                <span class="text-label-lg text-primary">Label large</span> • 
+                <span class="text-label-base text-secondary">Label standard</span> • 
+                <span class="text-label-sm text-tertiary">Label petit</span>
+            </div>
+            
+            <p class="text-caption text-tertiary">Texte de légende ou d'aide</p>
+            <p class="text-overline text-accent">Texte surligné</p>
+        </div>
+
+        <!-- Section Couleurs -->
+        <div class="demo-section">
+            <h2 class="text-heading-2xl text-primary">🎯 Couleurs sémantiques</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <!-- Textes -->
+                <div>
+                    <h4 class="text-label-base text-primary">Couleurs de texte</h4>
+                    <p class="text-primary">Texte primaire</p>
+                    <p class="text-secondary">Texte secondaire</p>
+                    <p class="text-tertiary">Texte tertiaire</p>
+                    <p class="text-accent">Texte d'accent</p>
+                    <p class="text-success">Texte de succès</p>
+                    <p class="text-warning">Texte d'alerte</p>
+                    <p class="text-error">Texte d'erreur</p>
+                </div>
+                
+                <!-- Surfaces -->
+                <div>
+                    <h4 class="text-label-base text-primary">Surfaces</h4>
+                    <div class="bg-surface-primary" style="padding: 0.5rem; margin: 0.25rem 0; border: 1px solid #e5e7eb;">Surface primaire</div>
+                    <div class="bg-surface-secondary" style="padding: 0.5rem; margin: 0.25rem 0;">Surface secondaire</div>
+                    <div class="bg-surface-tertiary" style="padding: 0.5rem; margin: 0.25rem 0;">Surface tertiaire</div>
+                    <div class="bg-surface-accent-subtle" style="padding: 0.5rem; margin: 0.25rem 0;">Surface accent subtile</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Boutons -->
+        <div class="demo-section">
+            <h2 class="text-heading-2xl text-primary">🔘 Boutons générés automatiquement</h2>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                <button class="button-primary">Bouton primaire</button>
+                <button class="button-secondary">Bouton secondaire</button>
+            </div>
+        </div>
+
+        <!-- Section Éléments interactifs -->
+        <div class="demo-section">
+            <h2 class="text-heading-2xl text-primary">⚡ Éléments interactifs</h2>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                <div class="interactive-primary" style="padding: 1rem; border-radius: 0.375rem; cursor: pointer;">
+                    <span class="text-inverse">Élément interactif primaire</span>
+                </div>
+                <div class="interactive-secondary" style="padding: 1rem; border-radius: 0.375rem; cursor: pointer;">
+                    <span class="text-primary">Élément interactif secondaire</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Cards -->
+        <div class="demo-section">
+            <h2 class="text-heading-2xl text-primary">📄 Cards générées</h2>
+            
+            <div class="card">
+                <h3 class="text-heading-lg text-primary">Card avec styles générés</h3>
+                <p class="text-body-base text-secondary">Cette card utilise la classe <code>.card</code> générée automatiquement à partir des tokens.</p>
+                <button class="button-primary">Action</button>
+            </div>
+        </div>
+
+        <!-- Section Process -->
+        <div class="demo-section bg-surface-accent-subtle">
+            <h2 class="text-heading-2xl text-accent">🤖 Comment ça marche</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                <div>
+                    <h4 class="text-label-lg text-primary">1. Tokens définis</h4>
+                    <p class="text-body-sm text-secondary">Les tokens sont définis dans <code>tokens.js</code></p>
+                    <pre style="background: #f3f4f6; padding: 0.5rem; border-radius: 0.25rem; font-size: 0.75rem;">
+'heading-hero': {
+  fontSize: '3rem',
+  fontWeight: '800',
+  lineHeight: '1.1',
+}</pre>
+                </div>
+                
+                <div>
+                    <h4 class="text-label-lg text-primary">2. CSS généré</h4>
+                    <p class="text-body-sm text-secondary">Le script génère automatiquement le CSS</p>
+                    <pre style="background: #f3f4f6; padding: 0.5rem; border-radius: 0.25rem; font-size: 0.75rem;">
+.text-heading-hero {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+}</pre>
+                </div>
+                
+                <div>
+                    <h4 class="text-label-lg text-primary">3. Utilisation directe</h4>
+                    <p class="text-body-sm text-secondary">Les classes sont prêtes à l'emploi</p>
+                    <pre style="background: #f3f4f6; padding: 0.5rem; border-radius: 0.25rem; font-size: 0.75rem;">
+&lt;h1 class="text-heading-hero"&gt;
+  Mon titre
+&lt;/h1&gt;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="demo-section">
+            <div style="text-align: center;">
+                <h3 class="text-heading-xl text-accent">Design System LSM</h3>
+                <p class="text-body-base text-secondary">Généré automatiquement à partir des tokens sémantiques</p>
+                <p class="text-caption text-tertiary">
+                    Toutes les classes de cette page sont générées automatiquement.<br>
+                    Modifiez <code>tokens.js</code> et lancez <code>npm run build:design-system</code>
+                </p>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html> 
