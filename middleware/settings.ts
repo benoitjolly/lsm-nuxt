@@ -3,10 +3,10 @@ import { onAuthStateChanged } from 'firebase/auth'
 import useAuth from '~/composables/useAuth'
 
 export default defineNuxtRouteMiddleware((to, from) => {
-  // Si on est côté serveur en mode SSR, rediriger vers la page de connexion
+  // Si on est côté serveur en mode SSR, rediriger vers la page d'accueil
   // pour éviter tout risque d'accès non autorisé
   if (process.server) {
-    return navigateTo('/login')
+    return navigateTo('/')
   }
   
   // Initialiser Firebase et récupérer l'instance auth
@@ -30,10 +30,10 @@ export default defineNuxtRouteMiddleware((to, from) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       unsubscribe()
       
-      // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
+      // Si l'utilisateur n'est pas connecté, rediriger vers la page d'accueil
       if (!user) {
-        console.warn('Utilisateur non connecté - redirection vers login')
-        return resolve(navigateTo('/login'))
+        console.warn('Utilisateur non connecté - redirection vers home')
+        return resolve(navigateTo('/'))
       }
       
       // Si l'utilisateur est connecté mais n'est pas modérateur ni admin, rediriger vers la page d'accueil

@@ -20,6 +20,7 @@ export { default as Modal } from './Modal.vue'
 export { default as Alert } from './Alert.vue'
 export { default as Tabs } from './Tabs.vue'
 export { default as ThemeToggle } from './ThemeToggle.vue'
+export { default as CartAnimation } from './CartAnimation.vue'
 
 // Export par défaut pour faciliter l'import
 export default {
@@ -40,4 +41,5 @@ export default {
   Alert: () => import('./Alert.vue'),
   Tabs: () => import('./Tabs.vue'),
   ThemeToggle: () => import('./ThemeToggle.vue'),
+  CartAnimation: () => import('./CartAnimation.vue'),
 } 

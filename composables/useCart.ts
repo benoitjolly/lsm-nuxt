@@ -5,6 +5,13 @@ import type { Serrure } from '~/types/serrure'
 import useAuth from '~/composables/useAuth'
 import { useCartService } from '~/services/cartService'
 
+// Fonction pour déclencher l'animation de la pastille
+const triggerCartAnimation = () => {
+  if (typeof window !== 'undefined' && (window as any).triggerCartAnimation) {
+    (window as any).triggerCartAnimation()
+  }
+}
+
 // État local du panier (miroir pour UX rapide)
 const cart = ref<Cart>({
   items: [],
@@ -145,6 +152,9 @@ export default function useCart() {
       cart.value = updatedCart
       lastSyncTimestamp.value = updatedCart.updatedAt.getTime()
       saveLocalSnapshot()
+      
+      // Déclencher l'animation de la pastille
+      triggerCartAnimation()
     } catch (error) {
       console.error('Erreur lors de l\'ajout d\'article:', error)
       
@@ -169,6 +179,9 @@ export default function useCart() {
       
       updateLocalTotal()
       saveLocalSnapshot()
+      
+      // Déclencher l'animation même en cas d'erreur
+      triggerCartAnimation()
     }
   }
 

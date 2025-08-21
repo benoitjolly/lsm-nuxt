@@ -56,17 +56,19 @@
             <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
           </svg>
           <ClientOnly>
-            <span v-if="itemCount > 0" class="cart-badge">{{ itemCount }}</span>
+            <div v-if="itemCount > 0" class="cart-badge" :class="{ 'cart-badge-animate': isAnimating }">
+              <span>{{ itemCount }}</span>
+            </div>
           </ClientOnly>
         </div>
       </NuxtLink>
       
       <!-- Profil utilisateur -->
       <NuxtLink 
-        to="/profile" 
+        :to="isLoggedIn ? '/profile' : '/login'" 
         class="nav-link" 
-        :class="{ 'nav-link-active': $route.path === '/profile' }"
-        title="Profil utilisateur"
+        :class="{ 'nav-link-active': $route.path === '/profile' || $route.path === '/login' }"
+        :title="isLoggedIn ? 'Profil utilisateur' : 'Se connecter'"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="nav-icon">
           <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437.695z" clip-rule="evenodd" />
@@ -108,11 +110,21 @@
 import { useRouter } from 'vue-router'
 import useAuth from '~/composables/useAuth'
 import useCart from '~/composables/useCart'
+import { useCartAnimation } from '~/composables/useCartAnimation'
 import { designTokens } from '~/design-system/tokens.js'
 
 const router = useRouter()
-const { isAdmin, isModerator } = useAuth()
+const { isAdmin, isModerator, isLoggedIn } = useAuth()
 const { itemCount } = useCart()
+const { isAnimating, triggerAnimation } = useCartAnimation()
+
+// Exposer les fonctions d'animation globalement
+if (typeof window !== 'undefined') {
+  window.triggerCartAnimation = () => {
+    console.log('🎬 Animation déclenchée!')
+    triggerAnimation()
+  }
+}
 </script>
 
 <style scoped>
@@ -203,6 +215,7 @@ const { itemCount } = useCart()
   height: 2.25rem; /* 36px */
   background-color: v-bind('designTokens.colors.semantic["interactive-secondary"]');
   transition: v-bind('designTokens.transitions.property.colors') v-bind('designTokens.transitions.duration[150]') v-bind('designTokens.transitions.timing.inOut');
+  overflow: visible; /* Permettre au badge de déborder */
 }
 
 .nav-link:hover {
@@ -242,25 +255,63 @@ const { itemCount } = useCart()
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible; /* Permettre au badge de déborder */
 }
 
 .cart-badge {
   position: absolute;
-top: -1rem; /* -px - plus en haut */
+  top: -1rem; /* -px - plus en haut */
   left: 1rem; /* -4px - à gauche au lieu de droite */
   background-color: #4f46e5; /* blue-500 - background bleu */
   color: white; /* texte blanc */
   font-size: 0.625rem; /* 10px */
   font-weight: v-bind('designTokens.typography.fontWeight.bold');
-  border-radius: v-bind('designTokens.borders.radius.full');
-  min-width: 1.25rem; /* 20px - légèrement plus large */
-  height: 1.25rem; /* 20px - légèrement plus haut */
-  display: flex;
+  border-radius: 0.625rem; /* 10px - border radius fixe pour forme ovale */
+  height: 1.25rem; /* 20px - hauteur fixe */
+  display: inline-flex; /* inline-flex pour s'adapter au contenu */
   align-items: center;
   justify-content: center;
-  padding: 0 0.25rem; /* 4px - plus de padding */
-  line-height: 1;
   border: 2px solid white; /* bordure blanche pour contraste */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* ombre légère */
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-sizing: border-box; /* Inclure padding et border dans la largeur */
+  width: max-content; /* Largeur qui s'adapte au contenu */
+  min-width: 1.25rem; /* Largeur minimale pour les petits nombres */
+}
+
+.cart-badge span {
+  white-space: nowrap; /* Empêcher le retour à la ligne */
+  line-height: 1.25rem; /* Même hauteur que le conteneur pour centrer verticalement */
+  padding: 0 0.375rem; /* 6px - padding horizontal */
+  text-align: center;
+  display: block;
+  padding: 0;
+}
+
+.cart-badge-animate {
+  animation: cartBadgePulse 0.6s ease-in-out;
+}
+
+@keyframes cartBadgePulse {
+  0% {
+    transform: scaleX(1) scaleY(1);
+    background-color: #4f46e5;
+  }
+  25% {
+    transform: scaleX(2.8) scaleY(2.4);
+    background-color: #7c3aed;
+  }
+  50% {
+    transform: scaleX(2.6) scaleY(2.3);
+    background-color: #8b5cf6;
+  }
+  75% {
+    transform: scaleX(2.3) scaleY(2.15);
+    background-color: #7c3aed;
+  }
+  100% {
+    transform: scaleX(1) scaleY(1);
+    background-color: #4f46e5;
+  }
 }
 </style> 
