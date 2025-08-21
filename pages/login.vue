@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 // Définir cette page comme publique (pas besoin de middleware)
 definePageMeta({
@@ -30,8 +30,20 @@ definePageMeta({
 
 const router = useRouter()
 
+const route = useRoute()
+
 const onLoginSuccess = () => {
-  // Éventuelles actions supplémentaires après la connexion réussie
-  console.log('Connexion réussie')
+  // Récupérer l'URL de redirection depuis les paramètres de requête
+  const redirectTo = route.query.redirect as string
+  
+  if (redirectTo) {
+    // Rediriger vers la page demandée
+    router.push(redirectTo)
+  } else {
+    // Redirection par défaut vers la page d'accueil
+    router.push('/')
+  }
+  
+  console.log('Connexion réussie, redirection vers:', redirectTo || '/')
 }
 </script> 

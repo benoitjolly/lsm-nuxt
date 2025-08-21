@@ -15,7 +15,7 @@ export default function useAuth() {
     userRoles.value = []
     
     // Si l'utilisateur est connecté et que nous sommes côté client, récupérer ses rôles
-    if (newUser && process.client) {
+    if (newUser && typeof window !== 'undefined') {
       try {
         const { db } = initializeFirebase()
         if (db) {
@@ -37,7 +37,7 @@ export default function useAuth() {
   }
 
   const logout = async () => {
-    if (process.server) {
+    if (typeof window === 'undefined') {
       return false
     }
     

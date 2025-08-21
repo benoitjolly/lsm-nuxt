@@ -1,10 +1,11 @@
 <template>
-  <div class="settings-page">
-    <div class="header-section">
-      <Heading level="1">Paramètres</Heading>
-    </div>
+  <div>
+    <Heading level="1" class="mb-6">Paramètres</Heading>
+    <p class="text-sm text-gray-500 max-w-3xl mb-8">
+      Configuration et gestion des paramètres du système
+    </p>
 
-    <div class="tabs-section">
+    <Card class="mb-6">
       <Tabs v-model="activeTab" :tabs="settingsTabs">
         <template #default="{ activeTab }">
           
@@ -39,9 +40,175 @@
             />
           </div>
 
+          <!-- Onglet Commandes -->
+          <div v-if="activeTab === 'commandes'" class="tab-content">
+            <div class="space-y-6">
+              <div>
+                <h3 class="text-lg font-medium text-gray-900">Gestion des Commandes</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                  Consultation et gestion des commandes effectuées
+                </p>
+              </div>
+
+              <!-- Loading state -->
+              <div v-if="loadingOrders" class="text-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+                <p class="mt-2 text-sm text-gray-500">Chargement des commandes...</p>
+              </div>
+
+              <!-- Empty state -->
+              <div v-else-if="orders.length === 0" class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune commande</h3>
+                <p class="mt-1 text-sm text-gray-500">Aucune commande n'a été effectuée pour le moment.</p>
+              </div>
+
+              <!-- Orders list -->
+              <div v-else class="space-y-4">
+                <div v-for="order in orders" :key="order.id" class="bg-white border border-gray-200 rounded-lg p-6">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <h4 class="text-lg font-medium text-gray-900">
+                        Commande #{{ order.id?.slice(-8).toUpperCase() }}
+                      </h4>
+                      <p class="text-sm text-gray-500">
+                        {{ new Date(order.orderDate).toLocaleDateString('fr-FR', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        }) }}
+                      </p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span 
+                        :class="[
+                          'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                          getStatusColor(order.status)
+                        ]"
+                      >
+                        {{ getStatusLabel(order.status) }}
+                      </span>
+                      
+                      <!-- Dropdown pour changer le statut -->
+                      <div class="relative status-dropdown">
+                        <button 
+                          @click="toggleStatusDropdown(order.id!)"
+                          :disabled="updatingOrderStatus === order.id"
+                          class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+                        >
+                          <svg 
+                            v-if="updatingOrderStatus === order.id"
+                            class="animate-spin w-4 h-4 mr-1" 
+                            fill="none" 
+                            viewBox="0 0 24 24"
+                          >
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <svg 
+                            v-else
+                            class="w-4 h-4 mr-1" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                          </svg>
+                          {{ updatingOrderStatus === order.id ? 'Mise à jour...' : 'Modifier' }}
+                        </button>
+                        
+                        <!-- Dropdown menu -->
+                        <div 
+                          v-if="openStatusDropdown === order.id"
+                          class="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-xl z-50"
+                          style="min-width: 200px; max-width: 250px;"
+                        >
+                          <div class="py-1">
+                            <button 
+                              v-for="status in availableStatuses" 
+                              :key="status.value"
+                              @click="updateOrderStatus(order.id!, status.value)"
+                              class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center transition-colors duration-150 focus:outline-none focus:bg-gray-50"
+                            >
+                              <span 
+                                :class="[
+                                  'w-2 h-2 rounded-full mr-3 flex-shrink-0',
+                                  getStatusColor(status.value).replace('bg-', '').replace('text-', 'bg-')
+                                ]"
+                              ></span>
+                              <span class="truncate">{{ status.label }}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Order details -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Items -->
+                    <div>
+                      <h5 class="text-sm font-medium text-gray-900 mb-3">Articles commandés</h5>
+                      <div class="space-y-2">
+                        <div 
+                          v-for="item in order.items" 
+                          :key="item.id"
+                          class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                        >
+                          <div class="flex items-center space-x-3">
+                            <img 
+                              v-if="item.photoUrl" 
+                              :src="item.photoUrl" 
+                              :alt="item.designation || item.codeArticle"
+                              class="w-10 h-10 object-cover rounded-md"
+                            />
+                            <div v-else class="w-10 h-10 bg-gray-200 rounded-md flex items-center justify-center">
+                              <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p class="text-sm font-medium text-gray-900">{{ item.codeArticle }}</p>
+                              <p class="text-xs text-gray-500">{{ item.designation || 'Sans désignation' }}</p>
+                            </div>
+                          </div>
+                          <div class="text-sm text-gray-900 font-medium">
+                            Qté: {{ item.quantity }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Shipping info -->
+                    <div>
+                      <h5 class="text-sm font-medium text-gray-900 mb-3">Adresse de livraison</h5>
+                      <div class="text-sm text-gray-600 space-y-1">
+                        <p>{{ order.shippingAddress.firstName }} {{ order.shippingAddress.lastName }}</p>
+                        <p v-if="order.shippingAddress.company">{{ order.shippingAddress.company }}</p>
+                        <p>{{ order.shippingAddress.address }}</p>
+                        <p>{{ order.shippingAddress.postalCode }} {{ order.shippingAddress.city }}</p>
+                        <p>{{ order.shippingAddress.country }}</p>
+                        <p v-if="order.shippingAddress.phone">{{ order.shippingAddress.phone }}</p>
+                      </div>
+                      
+                      <div v-if="order.notes" class="mt-4">
+                        <h6 class="text-sm font-medium text-gray-900 mb-2">Notes</h6>
+                        <p class="text-sm text-gray-600">{{ order.notes }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </template>
       </Tabs>
-    </div>
+    </Card>
     
     <!-- Modal pour les formulaires de serrure -->
     <Modal 
@@ -123,8 +290,10 @@ import SerrureForm from '~/components/SerrureForm.vue'
 import EditAuthCheck from '~/components/EditAuthCheck.vue'
 import type { Serrure } from '~/types/serrure'
 import type { TypeSerrure } from '~/types/typeSerrure'
+import type { Order, OrderStatus } from '~/types/cart'
 import { useSerrureService } from '~/services/serrureService'
 import { useTypeSerrureService } from '~/services/typeSerrureService'
+import { useOrderService } from '~/services/orderService'
 import useAuth from '~/composables/useAuth'
 
 // Définir le middleware settings pour admin/moderator
@@ -139,12 +308,14 @@ const router = useRouter()
 // Services et composables
 const serrureService = useSerrureService()
 const typeSerrureService = useTypeSerrureService()
+const orderService = useOrderService()
 const { isModerator } = useAuth()
 
 // Configuration des onglets
 const settingsTabs = [
   { id: 'serrures', label: 'Serrures' },
-  { id: 'types', label: 'Types' }
+  { id: 'types', label: 'Types' },
+  { id: 'commandes', label: 'Commandes' }
 ]
 
 // État de l'onglet actif - initialiser avec le paramètre de l'URL ou 'serrures' par défaut
@@ -167,6 +338,21 @@ const showTypeForm = ref(false)
 const selectedType = ref<Partial<TypeSerrure> | undefined>(undefined)
 const typeToDeleteId = ref<string | undefined>(undefined)
 
+// État pour la gestion des commandes
+const orders = ref<Order[]>([])
+const loadingOrders = ref(true)
+const openStatusDropdown = ref<string | null>(null)
+const updatingOrderStatus = ref<string | null>(null)
+
+// Statuts disponibles pour les commandes
+const availableStatuses = [
+  { value: 'pending', label: 'En attente' },
+  { value: 'confirmed', label: 'Confirmée' },
+  { value: 'shipped', label: 'Expédiée' },
+  { value: 'delivered', label: 'Livrée' },
+  { value: 'cancelled', label: 'Annulée' }
+]
+
 // Watcher pour synchroniser l'onglet actif avec l'URL
 watch(activeTab, (newTab) => {
   // Mettre à jour l'URL quand l'onglet change
@@ -186,8 +372,17 @@ watch(() => route.query.tab, (newTab) => {
 onMounted(async () => {
   await Promise.all([
     loadSerrures(),
-    loadTypes()
+    loadTypes(),
+    loadOrders()
   ])
+  
+  // Fermer le dropdown quand on clique en dehors
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
+    if (!target.closest('.status-dropdown')) {
+      openStatusDropdown.value = null
+    }
+  })
 })
 
 // Fonctions pour la gestion des serrures
@@ -286,6 +481,74 @@ const handleUnauthorized = () => {
   router.push('/')
 }
 
+// Fonctions pour la gestion des commandes
+const loadOrders = async () => {
+  try {
+    loadingOrders.value = true
+    // Charger toutes les commandes (pour les admins/moderators)
+    orders.value = await orderService.getAllOrders()
+  } catch (error) {
+    console.error('Erreur lors du chargement des commandes:', error)
+  } finally {
+    loadingOrders.value = false
+  }
+}
+
+// Fonctions utilitaires pour les statuts
+const getStatusLabel = (status: string): string => {
+  const statusLabels: Record<string, string> = {
+    'pending': 'En attente',
+    'confirmed': 'Confirmée',
+    'shipped': 'Expédiée',
+    'delivered': 'Livrée',
+    'cancelled': 'Annulée'
+  }
+  return statusLabels[status] || status
+}
+
+const getStatusColor = (status: string): string => {
+  const statusColors: Record<string, string> = {
+    'pending': 'bg-yellow-100 text-yellow-800',
+    'confirmed': 'bg-blue-100 text-blue-800',
+    'shipped': 'bg-purple-100 text-purple-800',
+    'delivered': 'bg-green-100 text-green-800',
+    'cancelled': 'bg-red-100 text-red-800'
+  }
+  return statusColors[status] || 'bg-gray-100 text-gray-800'
+}
+
+// Fonctions pour la gestion des dropdowns de statut
+const toggleStatusDropdown = (orderId: string) => {
+  if (openStatusDropdown.value === orderId) {
+    openStatusDropdown.value = null
+  } else {
+    openStatusDropdown.value = orderId
+  }
+}
+
+const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  try {
+    updatingOrderStatus.value = orderId
+    
+    // Mettre à jour le statut dans Firestore
+    await orderService.updateOrderStatus(orderId, newStatus as OrderStatus)
+    
+    // Mettre à jour la liste locale
+    const orderIndex = orders.value.findIndex(order => order.id === orderId)
+    if (orderIndex !== -1) {
+      orders.value[orderIndex].status = newStatus as OrderStatus
+    }
+    
+    // Fermer le dropdown
+    openStatusDropdown.value = null
+    
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du statut:', error)
+  } finally {
+    updatingOrderStatus.value = null
+  }
+}
+
 // Fonctions pour la gestion des types
 const loadTypes = async () => {
   try {
@@ -369,73 +632,9 @@ const deleteType = async () => {
 </script>
 
 <style scoped>
-.settings-page {
-  width: 100%;
-  padding: 0.5rem;
-  min-height: calc(100vh - 4rem);
-  overflow-x: hidden;
-}
-
-@media (min-width: 640px) {
-  .settings-page {
-    padding: 1rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .settings-page {
-    padding: 1.5rem;
-  }
-}
-
-.header-section {
-  margin-bottom: 3rem;
-}
-
-.tabs-section {
-  background-color: #ffffff;
-  border-radius: 0.75rem;
-  padding: 0.75rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  overflow-x: hidden;
-  width: 100%;
-}
-
-@media (min-width: 640px) {
-  .tabs-section {
-    padding: 1.25rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .tabs-section {
-    padding: 1.75rem;
-  }
-}
-
 .tab-content {
   margin-top: 2rem;
 }
-
-.hello-content {
-  text-align: center;
-  padding: 3rem 2rem;
-}
-
-.hello-content h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 1rem;
-}
-
-.hello-content p {
-  color: #6b7280;
-  font-size: 1.125rem;
-  line-height: 1.6;
-}
-
-
 
 .modal-actions {
   display: flex;

@@ -50,33 +50,54 @@
           <!-- Grille de produits -->
           <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
             <div v-for="serrure in filteredSerrures" :key="serrure.id" class="group relative">
-              <NuxtLink :to="`/serrure/${serrure.id}`" class="block group cursor-pointer" :aria-label="`Détails de la serrure ${serrure.designation || 'Sans nom'}`">
-                <div class="w-full bg-gray-100 rounded-lg overflow-hidden aspect-w-1 aspect-h-1 transition-shadow duration-300 group-hover:shadow-lg">
-                  <img
-                    v-if="serrure.photoUrl"
-                    :src="serrure.photoUrl"
-                    :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle || 'Sans nom'}`"
-                    class="w-full h-full object-center object-cover"
-                    loading="lazy"
-                  />
-                  <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                
-                <div class="mt-4 flex justify-between">
-                  <div>
-                    <h3 class="text-sm text-gray-700 font-medium group-hover:text-indigo-600">
-                      {{ serrure.designation || 'Serrure' }}
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ serrure.codeArticle }}</p>
+              <div class="block group cursor-pointer">
+                <NuxtLink :to="`/serrure/${serrure.id}`" class="block" :aria-label="`Détails de la serrure ${serrure.designation || 'Sans nom'}`">
+                  <div class="w-full bg-gray-100 rounded-lg overflow-hidden aspect-w-1 aspect-h-1 transition-shadow duration-300 group-hover:shadow-lg">
+                    <img
+                      v-if="serrure.photoUrl"
+                      :src="serrure.photoUrl"
+                      :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle || 'Sans nom'}`"
+                      class="w-full h-full object-center object-cover"
+                      loading="lazy"
+                    />
+                    <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-indigo-300" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
                   </div>
                   
-                  <p class="text-sm font-medium text-gray-900">{{ serrure.longueurDuCorpsMm }} mm</p>
+                  <div class="mt-4 flex justify-between">
+                    <div>
+                      <h3 class="text-sm text-gray-700 font-medium group-hover:text-indigo-600">
+                        {{ serrure.designation || 'Serrure' }}
+                      </h3>
+                      <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ serrure.codeArticle }}</p>
+                    </div>
+                    
+                    <p class="text-sm font-medium text-gray-900">{{ serrure.longueurDuCorpsMm }} mm</p>
+                  </div>
+                </NuxtLink>
+                
+                <!-- Section d'ajout au panier -->
+                <div class="mt-4">
+                  <div class="flex items-center space-x-2">
+                    <input
+                      v-model="quantities[serrure.id || '']"
+                      type="number"
+                      min="1"
+                      class="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Qté"
+                    />
+                    <button
+                      @click="handleAddToCart(serrure)"
+                      class="flex-1 bg-indigo-600 text-white text-sm px-3 py-1 rounded-md hover:bg-indigo-700 transition-colors duration-150"
+                    >
+                      Ajouter
+                    </button>
+                  </div>
                 </div>
-              </NuxtLink>
+              </div>
             </div>
           </div>
           
@@ -98,6 +119,7 @@ import type { TypeSerrure } from '~/types/typeSerrure'
 import { useSerrureService } from '~/services/serrureService'
 import { useTypeSerrureService } from '~/services/typeSerrureService'
 import useAuth from '~/composables/useAuth'
+import useCart from '~/composables/useCart'
 import { useSeoMeta } from 'unhead'
 import { useSeoConfig } from '~/composables/useSeoConfig'
 
@@ -115,6 +137,19 @@ const loading = ref(true)
 const serrureService = useSerrureService()
 const typeSerrureService = useTypeSerrureService()
 const { isLoggedIn, isAdmin } = useAuth()
+const { addToCart } = useCart()
+const quantities = ref<Record<string, number>>({})
+
+// Fonction pour ajouter une serrure au panier
+const handleAddToCart = (serrure: Serrure) => {
+  if (!serrure.id) return
+  
+  const quantity = quantities.value[serrure.id] || 1
+  addToCart(serrure, quantity)
+  
+  // Réinitialiser la quantité
+  quantities.value[serrure.id] = 1
+}
 
 // Configuration SEO
 const { 

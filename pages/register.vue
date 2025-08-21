@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 definePageMeta({
   middleware: [],
@@ -28,9 +28,20 @@ definePageMeta({
 })
 
 const router = useRouter()
+const route = useRoute()
 
 const onRegisterSuccess = () => {
-  // Éventuelles actions supplémentaires après l'inscription réussie
-  console.log('Inscription réussie')
+  // Récupérer l'URL de redirection depuis les paramètres de requête
+  const redirectTo = route.query.redirect as string
+  
+  if (redirectTo) {
+    // Rediriger vers la page demandée
+    router.push(redirectTo)
+  } else {
+    // Redirection par défaut vers la page d'accueil
+    router.push('/')
+  }
+  
+  console.log('Inscription réussie, redirection vers:', redirectTo || '/')
 }
 </script> 

@@ -189,6 +189,75 @@
             </div>
           </dl>
         </div>
+        
+        <!-- Actions d'ajout au panier -->
+        <div class="bg-gray-50 px-4 py-5 sm:px-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900">Ajouter au panier</h3>
+            <div class="flex items-center space-x-4">
+              <!-- Contrôles de quantité -->
+              <div class="flex items-center space-x-2">
+                <label for="quantity" class="text-sm font-medium text-gray-700">Quantité :</label>
+                <div class="flex items-center space-x-1 bg-white rounded-md border border-gray-300 p-1">
+                  <button 
+                    @click="quantity > 1 && quantity--"
+                    class="w-8 h-8 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center hover:bg-gray-200 disabled:opacity-50"
+                    :disabled="quantity <= 1"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                    </svg>
+                  </button>
+                  <input 
+                    v-model.number="quantity"
+                    type="number" 
+                    id="quantity"
+                    min="1"
+                    max="99"
+                    class="w-16 text-center border-0 bg-transparent focus:ring-0 text-sm font-medium"
+                  />
+                  <button 
+                    @click="quantity < 99 && quantity++"
+                    class="w-8 h-8 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center hover:bg-gray-200"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Bouton d'ajout -->
+              <button 
+                @click="handleAddToCart"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0H17" />
+                </svg>
+                Ajouter au panier
+              </button>
+            </div>
+          </div>
+          
+          <!-- Statut du panier pour cet article -->
+          <div v-if="isInCart(serrureId)" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+            <div class="flex items-center">
+              <svg class="h-5 w-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm text-green-800">
+                Cet article est dans votre panier ({{ getQuantityInCart(serrureId) }} {{ getQuantityInCart(serrureId) > 1 ? 'unités' : 'unité' }})
+              </span>
+              <NuxtLink 
+                to="/panier"
+                class="ml-2 text-sm text-green-600 hover:text-green-500 font-medium"
+              >
+                Voir le panier
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
       </div>
       
 
@@ -248,6 +317,7 @@ import type { TypeSerrure } from '~/types/typeSerrure'
 import { useSerrureService } from '~/services/serrureService'
 import { useTypeSerrureService } from '~/services/typeSerrureService'
 import useAuth from '~/composables/useAuth'
+import useCart from '~/composables/useCart'
 import { useSeoConfig } from '~/composables/useSeoConfig'
 
 
@@ -270,6 +340,10 @@ const serrureService = useSerrureService()
 const { getSerrureById } = useSerrureService()
 const { getTypeSerrureById } = useTypeSerrureService()
 const { isLoggedIn, isModerator } = useAuth()
+const { addToCart, isInCart, getQuantityInCart } = useCart()
+
+// État pour la quantité à ajouter au panier
+const quantity = ref(1)
 
 // Configuration SEO
 const { 
@@ -431,5 +505,14 @@ const handleImageError = () => {
 // Fonction pour revenir à la page précédente
 const goBack = () => {
   router.back()
+}
+
+// Fonction pour ajouter au panier
+const handleAddToCart = () => {
+  if (serrure.value) {
+    addToCart(serrure.value, quantity.value)
+    // Optionnel : réinitialiser la quantité après ajout
+    quantity.value = 1
+  }
 }
 </script> 

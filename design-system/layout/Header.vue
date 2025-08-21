@@ -44,7 +44,22 @@
     
     <!-- Menu utilisateur -->
     <div class="user-menu">
-
+      <!-- Panier -->
+      <NuxtLink 
+        to="/panier" 
+        class="nav-link cart-link" 
+        :class="{ 'nav-link-active': $route.path === '/panier' }"
+        title="Mon panier"
+      >
+        <div class="cart-icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="nav-icon">
+            <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
+          </svg>
+          <ClientOnly>
+            <span v-if="itemCount > 0" class="cart-badge">{{ itemCount }}</span>
+          </ClientOnly>
+        </div>
+      </NuxtLink>
       
       <!-- Profil utilisateur -->
       <NuxtLink 
@@ -92,11 +107,12 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import useAuth from '~/composables/useAuth'
+import useCart from '~/composables/useCart'
 import { designTokens } from '~/design-system/tokens.js'
-
 
 const router = useRouter()
 const { isAdmin, isModerator } = useAuth()
+const { itemCount } = useCart()
 </script>
 
 <style scoped>
@@ -219,5 +235,32 @@ const { isAdmin, isModerator } = useAuth()
     flex-direction: column;
     gap: v-bind('designTokens.spacing[2]');
   }
+}
+
+.cart-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-badge {
+  position: absolute;
+top: -1rem; /* -px - plus en haut */
+  left: 1rem; /* -4px - à gauche au lieu de droite */
+  background-color: #4f46e5; /* blue-500 - background bleu */
+  color: white; /* texte blanc */
+  font-size: 0.625rem; /* 10px */
+  font-weight: v-bind('designTokens.typography.fontWeight.bold');
+  border-radius: v-bind('designTokens.borders.radius.full');
+  min-width: 1.25rem; /* 20px - légèrement plus large */
+  height: 1.25rem; /* 20px - légèrement plus haut */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.25rem; /* 4px - plus de padding */
+  line-height: 1;
+  border: 2px solid white; /* bordure blanche pour contraste */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* ombre légère */
 }
 </style> 
