@@ -40,10 +40,14 @@ const onLoginSuccess = () => {
     // Rediriger vers la page demandée
     router.push(redirectTo)
   } else {
-    // Redirection par défaut vers la page d'accueil
-    router.push('/')
+    // Vérifier s'il y a une page précédente dans l'historique
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      // Retourner à la page précédente
+      router.back()
+    } else {
+      // Redirection par défaut vers la page d'accueil si pas d'historique
+      router.push('/')
+    }
   }
-  
-  console.log('Connexion réussie, redirection vers:', redirectTo || '/')
 }
 </script> 

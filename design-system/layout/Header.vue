@@ -190,6 +190,11 @@ if (typeof window !== 'undefined') {
   width: 100%;
   height: auto;
   border-radius: v-bind('designTokens.borders.radius.md');
+  transition: filter 0.2s ease-in-out;
+}
+
+.logo-link:hover .logo-image {
+  filter: brightness(1) invert(0); /* Retour à la couleur originale au hover */
 }
 
 .nav-container {
@@ -214,7 +219,7 @@ if (typeof window !== 'undefined') {
   width: 2.25rem; /* 36px */
   height: 2.25rem; /* 36px */
   background-color: v-bind('designTokens.colors.semantic["interactive-secondary"]');
-  transition: v-bind('designTokens.transitions.property.colors') v-bind('designTokens.transitions.duration[150]') v-bind('designTokens.transitions.timing.inOut');
+  transition: all 0.2s ease-in-out;
   overflow: visible; /* Permettre au badge de déborder */
 }
 
@@ -223,13 +228,31 @@ if (typeof window !== 'undefined') {
 }
 
 .nav-link-active {
-  background-color: v-bind('designTokens.colors.semantic["interactive-secondary-active"]');
+  background-color: v-bind('designTokens.colors.semantic["interactive-primary"]');
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3); /* Ombre bleue pour l'effet */
+}
+
+.nav-link-active:hover {
+  background-color: v-bind('designTokens.colors.semantic["interactive-primary-hover"]');
 }
 
 .nav-icon {
   width: 1.25rem; /* 20px */
   height: 1.25rem; /* 20px */
   color: v-bind('designTokens.colors.semantic["text-secondary"]');
+  transition: color 0.2s ease-in-out;
+}
+
+.nav-link-active .nav-icon {
+  color: white; /* Icône blanche quand active */
+}
+
+.nav-link:hover .nav-icon {
+  color: v-bind('designTokens.colors.semantic["text-primary"]'); /* Icône foncée au hover */
+}
+
+.nav-link-active:hover .nav-icon {
+  color: white; /* Garder l'icône blanche au hover si active */
 }
 
 .admin-icon {
