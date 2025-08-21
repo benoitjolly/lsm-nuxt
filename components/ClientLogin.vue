@@ -55,7 +55,7 @@
 
         <div class="flex items-center justify-between">
           <div class="text-sm">
-            <AuthLink to="/register">
+            <AuthLink :to="`/register${route.query.redirect ? `?redirect=${route.query.redirect}` : ''}`">
               Pas encore de compte ? S'inscrire
             </AuthLink>
           </div>
@@ -92,7 +92,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import useAuth from '~/composables/useAuth'
 import { useFirebaseAuth } from '~/composables/useFirebaseAuth'
 import { Button, AuthLink, Separator, Input } from '~/design-system/components'
@@ -104,9 +104,16 @@ const props = defineProps({
   }
 })
 
+const route = useRoute()
+const router = useRouter()
+
+// Récupérer l'URL de redirection depuis les paramètres de requête ou utiliser la prop
+const getRedirectUrl = () => {
+  return (route.query.redirect as string) || props.redirectTo
+}
+
 const emit = defineEmits(['login-success', 'login-error'])
 
-const router = useRouter()
 const { isLoggedIn } = useAuth()
 const { signInWithEmail, signInWithGoogle, error, loading } = useFirebaseAuth()
 
@@ -118,7 +125,7 @@ const isLoading = ref(false)
 // Rediriger si déjà connecté
 onMounted(() => {
   if (isLoggedIn.value) {
-    router.push(props.redirectTo)
+    router.push(getRedirectUrl())
   }
 })
 
@@ -141,7 +148,7 @@ const handleLogin = async () => {
     const success = await signInWithEmail(email.value, password.value)
     if (success) {
       emit('login-success')
-      router.push(props.redirectTo)
+      router.push(getRedirectUrl())
     }
   } catch (e) {
     console.error('Erreur de connexion:', e)
@@ -156,7 +163,7 @@ const handleGoogleLogin = async () => {
     const success = await signInWithGoogle()
     if (success) {
       emit('login-success')
-      router.push(props.redirectTo)
+      router.push(getRedirectUrl())
     }
   } catch (e) {
     console.error('Erreur de connexion Google:', e)

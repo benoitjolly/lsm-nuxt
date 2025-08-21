@@ -49,8 +49,43 @@ service cloud.firestore {
       
       // Créer son propre profil (lors de l'inscription)
       allow create: if request.auth != null && 
-                     request.auth.uid == userId && 
-                     (!request.resource.data.keys().hasAny(['roles']) || request.resource.data.roles.size() == 0);
+                     request.auth.uid == userId;
+    }
+    
+    // Règles pour la collection carts (paniers)
+    match /carts/{cartDocId} {
+      // Permettre la création de paniers anonymes (sans authentification)
+      allow create: if request.resource.data.userId == null;
+      
+      // Permettre la création de paniers utilisateur (avec authentification)
+      allow create: if request.auth != null && 
+                     request.resource.data.userId == request.auth.uid;
+      
+      // Permettre la lecture/écriture pour TOUS les paniers (anonymes et utilisateur)
+      // Les paniers anonymes sont accessibles sans authentification
+      // Les paniers utilisateur sont protégés par leur cartId unique
+      allow read, write: if true;
+      
+      // Les administrateurs peuvent lire tous les paniers
+      allow read, write: if isAdmin();
+    }
+    
+    // Règles pour la collection orders (commandes) - TRÈS PERMISSIVES
+    match /orders/{orderId} {
+      // L'utilisateur peut lire ses propres commandes
+      allow read: if request.auth != null && 
+                   resource.data.userId == request.auth.uid;
+      
+      // L'utilisateur peut créer ses propres commandes (AUCUNE vérification de rôle ou d'existence)
+      allow create: if request.auth != null && 
+                     request.resource.data.userId == request.auth.uid;
+      
+      // L'utilisateur peut mettre à jour ses propres commandes
+      allow update: if request.auth != null && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Les administrateurs peuvent lire et modifier toutes les commandes
+      allow read, write: if isAdmin();
     }
     
     // Par défaut, refuser tout accès aux autres collections

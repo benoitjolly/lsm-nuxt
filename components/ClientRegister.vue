@@ -63,7 +63,7 @@
 
         <div class="flex items-center justify-between">
           <div class="text-sm">
-            <AuthLink to="/login">
+            <AuthLink :to="`/login${route.query.redirect ? `?redirect=${route.query.redirect}` : ''}`">
               Déjà un compte ? Se connecter
             </AuthLink>
           </div>
@@ -95,7 +95,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import useAuth from '~/composables/useAuth'
 import { useFirebaseAuth } from '~/composables/useFirebaseAuth'
 import { Button, AuthLink, Separator, Input } from '~/design-system/components'
@@ -107,9 +107,16 @@ const props = defineProps({
   }
 })
 
+const route = useRoute()
+const router = useRouter()
+
+// Récupérer l'URL de redirection depuis les paramètres de requête ou utiliser la prop
+const getRedirectUrl = () => {
+  return (route.query.redirect as string) || props.redirectTo
+}
+
 const emit = defineEmits(['register-success', 'register-error'])
 
-const router = useRouter()
 const { isLoggedIn } = useAuth()
 const { registerWithEmail, signInWithGoogle, error, loading } = useFirebaseAuth()
 
@@ -122,7 +129,7 @@ const isLoading = ref(false)
 // Rediriger si déjà connecté
 onMounted(() => {
   if (isLoggedIn.value) {
-    router.push(props.redirectTo)
+    router.push(getRedirectUrl())
   }
 })
 
@@ -150,7 +157,7 @@ const handleRegister = async () => {
     const success = await registerWithEmail(email.value, password.value)
     if (success) {
       emit('register-success')
-      router.push(props.redirectTo)
+      router.push(getRedirectUrl())
     }
   } catch (e) {
     console.error('Erreur d\'inscription:', e)
@@ -165,7 +172,7 @@ const handleGoogleLogin = async () => {
     const success = await signInWithGoogle()
     if (success) {
       emit('register-success')
-      router.push(props.redirectTo)
+      router.push(getRedirectUrl())
     }
   } catch (e) {
     console.error('Erreur de connexion Google:', e)

@@ -1,11 +1,11 @@
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore, type Firestore } from 'firebase/firestore'
 import { initializeFirebase } from '~/utils/firebase'
 
 export const useFirestore = () => {
-  if (process.server) {
-    return null
+  if (typeof window === 'undefined') {
+    return { db: null as Firestore | null }
   }
   
   const { db } = initializeFirebase()
-  return db
+  return { db: db || null }
 } 
