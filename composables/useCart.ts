@@ -5,224 +5,262 @@ import type { Serrure } from '~/types/serrure'
 import useAuth from '~/composables/useAuth'
 import { useCartService } from '~/services/cartService'
 
+// État local du panier (miroir pour UX rapide)
 const cart = ref<Cart>({
   items: [],
   totalItems: 0,
   updatedAt: new Date()
 })
 
+// État de synchronisation
+const isSyncing = ref(false)
+const lastSyncTimestamp = ref<number>(0)
+
 export default function useCart() {
   const { user } = useAuth()
-  const { saveUserCart, loadUserCart, deleteUserCart } = useCartService()
+  const { 
+    getCartId, 
+    setCartId, 
+    createAnonymousCart, 
+    getCart, 
+    addItemToCart, 
+    removeItemFromCart, 
+    updateItemQuantity, 
+    clearCart: clearCartBackend, 
+    associateCartWithUser, 
+    getUserCart 
+  } = useCartService()
 
-  // Clé de stockage locale basée sur l'utilisateur
-  const getStorageKey = () => {
-    return user.value ? `cart_${user.value.uid}` : 'cart_anonymous'
-  }
-
-  // Charger le panier (localStorage + backend si connecté)
-  const loadCart = async () => {
-    if (typeof window !== 'undefined') {
-      try {
-        // Si l'utilisateur est connecté, charger depuis le backend
-        if (user.value?.uid) {
-          const backendCart = await loadUserCart(user.value.uid)
-          if (backendCart) {
-            cart.value = backendCart
-            // Synchroniser avec localStorage
-            localStorage.setItem(getStorageKey(), JSON.stringify(cart.value))
-            return
-          }
-        }
-
-        // Fallback: charger depuis localStorage
-        const stored = localStorage.getItem(getStorageKey())
-        if (stored) {
-          const parsedCart = JSON.parse(stored)
-          // Convertir les dates string en objets Date
-          parsedCart.updatedAt = new Date(parsedCart.updatedAt)
-          parsedCart.items.forEach((item: CartItem) => {
-            item.addedAt = new Date(item.addedAt)
-          })
-          cart.value = parsedCart
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement du panier:', error)
-        clearCart()
-      }
-    }
-  }
-
-  // Sauvegarder le panier (localStorage + backend si connecté)
-  const saveCart = async () => {
-    if (typeof window !== 'undefined') {
-      try {
-        // Sauvegarder dans localStorage
-        localStorage.setItem(getStorageKey(), JSON.stringify(cart.value))
-        
-        // Si l'utilisateur est connecté, sauvegarder aussi dans le backend
-        if (user.value?.uid) {
-          await saveUserCart(user.value.uid, cart.value)
-        }
-      } catch (error) {
-        console.error('Erreur lors de la sauvegarde du panier:', error)
-      }
-    }
-  }
-
-  // Watcher pour sauvegarder automatiquement
-  watch(cart, () => {
-    saveCart()
-  }, { deep: true })
-
-  // Watcher pour recharger le panier quand l'utilisateur change
-  watch(user, async (newUser, oldUser) => {
-    if (newUser && !oldUser) {
-      // Utilisateur vient de se connecter
-      await syncCartOnLogin()
-    } else if (newUser && oldUser && newUser.uid !== oldUser.uid) {
-      // Utilisateur a changé (déconnexion puis reconnexion)
-      await loadCart()
-    } else if (!newUser && oldUser) {
-      // Utilisateur vient de se déconnecter
-      await loadCart()
-    }
-  })
-
-  // Synchroniser le panier lors de la connexion
-  const syncCartOnLogin = async () => {
-    if (!user.value?.uid) return
-
-    try {
-      // Charger le panier anonyme depuis localStorage
-      const anonymousCartKey = 'cart_anonymous'
-      const anonymousCartData = localStorage.getItem(anonymousCartKey)
-      
-      if (anonymousCartData) {
-        const anonymousCart = JSON.parse(anonymousCartData)
-        
-        // Charger le panier utilisateur depuis le backend
-        const userCart = await loadUserCart(user.value.uid)
-        
-        if (userCart && userCart.items.length > 0) {
-          // Fusionner les paniers
-          const mergedItems = [...userCart.items]
-          
-          anonymousCart.items.forEach((anonymousItem: CartItem) => {
-            const existingItem = mergedItems.find(item => item.serrureId === anonymousItem.serrureId)
-            if (existingItem) {
-              existingItem.quantity += anonymousItem.quantity
-            } else {
-              mergedItems.push(anonymousItem)
-            }
-          })
-          
-          cart.value = {
-            ...userCart,
-            items: mergedItems
-          }
-        } else {
-          // Utiliser le panier anonyme
-          cart.value = {
-            ...anonymousCart,
-            updatedAt: new Date(anonymousCart.updatedAt),
-            items: anonymousCart.items.map((item: CartItem) => ({
-              ...item,
-              addedAt: new Date(item.addedAt)
-            }))
-          }
-        }
-        
-        // Sauvegarder le panier fusionné
-        await saveCart()
-        
-        // Supprimer le panier anonyme
-        localStorage.removeItem(anonymousCartKey)
-      } else {
-        // Pas de panier anonyme, charger le panier utilisateur
-        await loadCart()
-      }
-    } catch (error) {
-      console.error('Erreur lors de la synchronisation du panier:', error)
-      await loadCart()
-    }
-  }
-
-  // Calculer le total d'articles
-  const updateTotalItems = () => {
+  // Mettre à jour le total des articles localement
+  const updateLocalTotal = () => {
     cart.value.totalItems = cart.value.items.reduce((total, item) => total + item.quantity, 0)
     cart.value.updatedAt = new Date()
   }
 
-  // Computed pour itemCount avec gestion de l'hydratation
-  const itemCount = computed(() => {
-    // Côté serveur, retourner 0 pour éviter les problèmes d'hydratation
-    if (typeof window === 'undefined') {
-      return 0
-    }
-    return cart.value.totalItems
-  })
-
-  // Ajouter un article au panier
-  const addToCart = (serrure: Serrure, quantity: number = 1) => {
-    const existingItem = cart.value.items.find(item => item.serrureId === serrure.id)
-    
-    if (existingItem) {
-      existingItem.quantity += quantity
-    } else {
-      const newItem: CartItem = {
-        id: `${serrure.id}_${Date.now()}`,
-        serrureId: serrure.id!,
-        codeArticle: serrure.codeArticle,
-        designation: serrure.designation,
-        typeSerrureNom: serrure.typeSerrureNom,
-        photoUrl: serrure.photoUrl,
-        quantity,
-        addedAt: new Date()
+  // Sauvegarder le snapshot local dans localStorage
+  const saveLocalSnapshot = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        const snapshot = {
+          items: cart.value.items,
+          totalItems: cart.value.totalItems,
+          timestamp: Date.now()
+        }
+        localStorage.setItem('cart_snapshot', JSON.stringify(snapshot))
+      } catch (error) {
+        console.error('❌ Erreur lors de la sauvegarde du snapshot local:', error)
       }
-      cart.value.items.push(newItem)
     }
+  }
+
+  // Charger le snapshot local depuis localStorage
+  const loadLocalSnapshot = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        const snapshotData = localStorage.getItem('cart_snapshot')
+        if (snapshotData) {
+          const snapshot = JSON.parse(snapshotData)
+          cart.value.items = snapshot.items.map((item: any) => ({
+            ...item,
+            addedAt: new Date(item.addedAt)
+          }))
+          cart.value.totalItems = snapshot.totalItems
+          cart.value.updatedAt = new Date(snapshot.timestamp)
+          return true
+        }
+      } catch (error) {
+        console.error('❌ Erreur lors du chargement du snapshot local:', error)
+      }
+    }
+    return false
+  }
+
+  // Synchroniser avec le backend
+  const syncWithBackend = async (force = false) => {
+    if (isSyncing.value) return
     
-    updateTotalItems()
+    try {
+      isSyncing.value = true
+      let cartId = getCartId()
+      
+      // Si pas de cart_id, en créer un nouveau
+      if (!cartId) {
+        cartId = await createAnonymousCart()
+      }
+      
+      // Récupérer le panier depuis le backend
+      const backendCart = await getCart(cartId)
+      
+      if (backendCart) {
+        // Vérifier si le backend est plus récent que le local
+        const backendTimestamp = backendCart.updatedAt.getTime()
+        const localTimestamp = lastSyncTimestamp.value
+        
+        if (force || backendTimestamp > localTimestamp) {
+          cart.value = backendCart
+          lastSyncTimestamp.value = backendTimestamp
+          saveLocalSnapshot()
+        }
+      } else {
+        cartId = await createAnonymousCart()
+        const newCart = await getCart(cartId)
+        if (newCart) {
+          cart.value = newCart
+          lastSyncTimestamp.value = newCart.updatedAt.getTime()
+          saveLocalSnapshot()
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la synchronisation:', error)
+      // En cas d'erreur, utiliser le snapshot local
+      loadLocalSnapshot()
+    } finally {
+      isSyncing.value = false
+    }
+  }
+
+  // Charger le panier (backend + fallback local)
+  const loadCart = async () => {
+    // Charger d'abord le snapshot local pour UX rapide
+    loadLocalSnapshot()
+    
+    // Synchroniser avec le backend
+    await syncWithBackend()
+  }
+
+  // Ajouter un article au panier (fonctionne même sans authentification)
+  const addToCart = async (serrure: Serrure, quantity: number = 1) => {
+    try {
+      let cartId = getCartId()
+      
+      // Si pas de cart_id, en créer un nouveau (anonyme)
+      if (!cartId) {
+        cartId = await createAnonymousCart()
+      }
+      
+      // Ajouter l'article dans le backend
+      const updatedCart = await addItemToCart(cartId, serrure, quantity)
+      
+      // Mettre à jour l'état local
+      cart.value = updatedCart
+      lastSyncTimestamp.value = updatedCart.updatedAt.getTime()
+      saveLocalSnapshot()
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout d\'article:', error)
+      
+      // Fallback local en cas d'erreur
+      const existingItem = cart.value.items.find(item => item.serrureId === serrure.id)
+      
+      if (existingItem) {
+        existingItem.quantity += quantity
+      } else {
+        const newItem: CartItem = {
+          id: `${serrure.id}_${Date.now()}`,
+          serrureId: serrure.id || '',
+          codeArticle: serrure.codeArticle,
+          designation: serrure.designation,
+          typeSerrureNom: serrure.typeSerrureNom,
+          photoUrl: serrure.photoUrl,
+          quantity,
+          addedAt: new Date()
+        }
+        cart.value.items.push(newItem)
+      }
+      
+      updateLocalTotal()
+      saveLocalSnapshot()
+    }
   }
 
   // Retirer un article du panier
-  const removeFromCart = (itemId: string) => {
-    const index = cart.value.items.findIndex(item => item.id === itemId)
-    if (index > -1) {
-      cart.value.items.splice(index, 1)
-      updateTotalItems()
+  const removeFromCart = async (itemId: string) => {
+    try {
+      const cartId = getCartId()
+      if (cartId) {
+        const updatedCart = await removeItemFromCart(cartId, itemId)
+        cart.value = updatedCart
+        lastSyncTimestamp.value = updatedCart.updatedAt.getTime()
+        saveLocalSnapshot()
+      } else {
+        // Fallback local
+        cart.value.items = cart.value.items.filter(item => item.id !== itemId)
+        updateLocalTotal()
+        saveLocalSnapshot()
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error)
+      // Fallback local
+      cart.value.items = cart.value.items.filter(item => item.id !== itemId)
+      updateLocalTotal()
+      saveLocalSnapshot()
     }
   }
 
   // Mettre à jour la quantité d'un article
-  const updateQuantity = (itemId: string, quantity: number) => {
-    const item = cart.value.items.find(item => item.id === itemId)
-    if (item) {
-      if (quantity <= 0) {
-        removeFromCart(itemId)
+  const updateQuantity = async (itemId: string, quantity: number) => {
+    try {
+      const cartId = getCartId()
+      if (cartId) {
+        const updatedCart = await updateItemQuantity(cartId, itemId, quantity)
+        cart.value = updatedCart
+        lastSyncTimestamp.value = updatedCart.updatedAt.getTime()
+        saveLocalSnapshot()
       } else {
-        item.quantity = quantity
-        updateTotalItems()
+        // Fallback local
+        const item = cart.value.items.find(item => item.id === itemId)
+        if (item) {
+          if (quantity <= 0) {
+            cart.value.items = cart.value.items.filter(item => item.id !== itemId)
+          } else {
+            item.quantity = quantity
+          }
+          updateLocalTotal()
+          saveLocalSnapshot()
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de quantité:', error)
+      // Fallback local
+      const item = cart.value.items.find(item => item.id === itemId)
+      if (item) {
+        if (quantity <= 0) {
+          cart.value.items = cart.value.items.filter(item => item.id !== itemId)
+        } else {
+          item.quantity = quantity
+        }
+        updateLocalTotal()
+        saveLocalSnapshot()
       }
     }
   }
 
-  // Vider le panier
+    // Vider le panier
   const clearCart = async () => {
-    cart.value = {
-      items: [],
-      totalItems: 0,
-      updatedAt: new Date()
-    }
-    
-    // Si l'utilisateur est connecté, supprimer aussi du backend
-    if (user.value?.uid) {
-      try {
-        await deleteUserCart(user.value.uid)
-      } catch (error) {
-        console.error('Erreur lors de la suppression du panier backend:', error)
+    try {
+      const cartId = getCartId()
+      if (cartId) {
+        const emptyCart = await clearCartBackend(cartId)
+        cart.value = emptyCart
+        lastSyncTimestamp.value = emptyCart.updatedAt.getTime()
+        saveLocalSnapshot()
+      } else {
+        // Fallback local
+        cart.value = {
+          items: [],
+          totalItems: 0,
+          updatedAt: new Date()
+        }
+        saveLocalSnapshot()
       }
+    } catch (error) {
+      console.error('Erreur lors du vidage:', error)
+      // Fallback local
+      cart.value = {
+        items: [],
+        totalItems: 0,
+        updatedAt: new Date()
+      }
+      saveLocalSnapshot()
     }
   }
 
@@ -239,8 +277,12 @@ export default function useCart() {
 
   // Créer une commande à partir du panier
   const createOrderFromCart = (shippingAddress: ShippingAddress, notes?: string): Order => {
-    if (!user.value) {
+    if (!user.value?.uid) {
       throw new Error('Utilisateur non connecté')
+    }
+
+    if (cart.value.items.length === 0) {
+      throw new Error('Panier vide')
     }
 
     const order: Order = {
@@ -256,9 +298,32 @@ export default function useCart() {
     return order
   }
 
+  // Watcher pour gérer la connexion/déconnexion
+  watch(user, async (newUser, oldUser) => {
+    if (newUser?.uid !== oldUser?.uid) {
+      if (newUser && !oldUser) {
+        // Utilisateur vient de se connecter
+        try {
+          const cartId = getCartId()
+          if (cartId) {
+            await associateCartWithUser(cartId, newUser.uid)
+            // Synchroniser pour récupérer les données mises à jour
+            await syncWithBackend(true)
+          }
+        } catch (error) {
+          console.error('Erreur lors de l\'association du panier:', error)
+        }
+      } else {
+        // Utilisateur s'est déconnecté ou changé
+        await loadCart()
+      }
+    }
+  })
+
   // Propriétés calculées
   const isEmpty = computed(() => cart.value.items.length === 0)
   const items = computed(() => cart.value.items)
+  const itemCount = computed(() => cart.value.totalItems)
 
   // Charger le panier au démarrage
   if (typeof window !== 'undefined') {
@@ -266,13 +331,10 @@ export default function useCart() {
   }
 
   return {
-    // État
     cart: readonly(cart),
     items,
     isEmpty,
     itemCount,
-    
-    // Actions
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -281,9 +343,9 @@ export default function useCart() {
     getQuantityInCart,
     createOrderFromCart,
     loadCart,
-    syncCartOnLogin,
+    syncWithBackend,
+    isSyncing: readonly(isSyncing),
     
-    // Utilitaires
-    updateTotalItems
+
   }
 }

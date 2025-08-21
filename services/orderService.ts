@@ -10,8 +10,10 @@ import {
   where, 
   orderBy, 
   limit,
+  Timestamp,
   type DocumentData 
 } from 'firebase/firestore'
+import { getAuth } from 'firebase/auth'
 import type { Order } from '~/types/cart'
 import { OrderStatus } from '~/types/cart'
 import { useFirestore } from '~/composables/useFirestore'
@@ -24,71 +26,65 @@ export function useOrderService() {
   // Créer une nouvelle commande
   const createOrder = async (order: Order): Promise<string> => {
     try {
+      console.log('🔄 Création de commande dans orderService...')
+      console.log('📋 Données de la commande:', order)
+      
+      // Vérifier l'authentification
+      const auth = getAuth()
+      const currentUser = auth.currentUser
+      console.log('🔐 Utilisateur authentifié:', currentUser?.uid)
+      console.log('🔐 userId dans la commande:', order.userId)
+      console.log('🔐 Correspondance:', currentUser?.uid === order.userId)
+      
+      if (!currentUser) {
+        throw new Error('Utilisateur non authentifié')
+      }
+      
+      if (currentUser.uid !== order.userId) {
+        throw new Error('userId ne correspond pas à l\'utilisateur authentifié')
+      }
+      
       // Vérifier que la base de données est disponible
       if (!db) {
         throw new Error('Firestore non disponible')
       }
+      
+      // Plus besoin de vérifier/créer l'utilisateur - les règles Firestore sont maintenant permissives
+      console.log('✅ Utilisateur authentifié, création de commande autorisée')
 
-      const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+      // Préparer les données pour Firestore
+      const orderData = {
         ...order,
-        orderDate: order.orderDate,
+        orderDate: Timestamp.fromDate(order.orderDate),
         items: order.items.map(item => ({
           ...item,
-          addedAt: item.addedAt
+          addedAt: Timestamp.fromDate(item.addedAt)
         }))
-      })
-      return docRef.id
-    } catch (error) {
-      console.error('Erreur lors de la création de la commande:', error)
-      throw error
-    }
-  }
-
-  // Obtenir une commande par ID
-  const getOrderById = async (id: string): Promise<Order | null> => {
-    try {
-      // Vérifier que la base de données est disponible
-      if (!db) {
-        console.warn('Firestore non disponible (probablement côté serveur)')
-        return null
       }
-
-      const docRef = doc(db, COLLECTION_NAME, id)
-      const docSnap = await getDoc(docRef)
       
-      if (docSnap.exists()) {
-        const data = docSnap.data()
-        return {
-          id: docSnap.id,
-          ...data,
-          orderDate: data.orderDate?.toDate() || new Date(),
-          items: data.items?.map((item: any) => ({
-            ...item,
-            addedAt: item.addedAt?.toDate() || new Date()
-          })) || []
-        } as Order
-      }
-      return null
-    } catch (error) {
-      console.error('Erreur lors de la récupération de la commande:', error)
+      console.log('📤 Données à envoyer à Firestore:', orderData)
+      console.log('🏪 Collection:', COLLECTION_NAME)
+
+      const docRef = await addDoc(collection(db, COLLECTION_NAME), orderData)
+      console.log('✅ Commande créée avec succès, ID:', docRef.id)
+      return docRef.id
+    } catch (error: any) {
+      console.error('❌ Erreur lors de la création de la commande dans orderService:', error)
+      console.error('🔍 Code d\'erreur:', error?.code)
+      console.error('🔍 Message d\'erreur:', error?.message)
       throw error
     }
   }
 
   // Obtenir toutes les commandes d'un utilisateur
-  const getUserOrders = async (userId: string, limitCount: number = 50): Promise<Order[]> => {
-    try {
-      // Vérifier que la base de données est disponible
-      if (!db) {
-        console.warn('Firestore non disponible (probablement côté serveur)')
-        return []
-      }
+  const getUserOrders = async (userId: string): Promise<Order[]> => {
+    if (!db) throw new Error('Firestore non disponible')
 
+    try {
       const q = query(
         collection(db, COLLECTION_NAME),
         where('userId', '==', userId),
-        orderBy('orderDate', 'desc'),
-        limit(limitCount)
+        orderBy('orderDate', 'desc')
       )
       
       const querySnapshot = await getDocs(q)
@@ -98,35 +94,31 @@ export function useOrderService() {
         const data = doc.data()
         orders.push({
           id: doc.id,
-          ...data,
-          orderDate: data.orderDate?.toDate() || new Date(),
-          items: data.items?.map((item: any) => ({
-            ...item,
-            addedAt: item.addedAt?.toDate() || new Date()
-          })) || []
-        } as Order)
+          userId: data.userId,
+          items: data.items,
+          shippingAddress: data.shippingAddress,
+          status: data.status,
+          totalItems: data.totalItems,
+          orderDate: data.orderDate.toDate(),
+          notes: data.notes
+        })
       })
       
       return orders
     } catch (error) {
-      console.error('Erreur lors de la récupération des commandes utilisateur:', error)
+      console.error('Erreur lors de la récupération des commandes:', error)
       throw error
     }
   }
 
-  // Obtenir toutes les commandes (pour les administrateurs)
-  const getAllOrders = async (limitCount: number = 100): Promise<Order[]> => {
-    try {
-      // Vérifier que la base de données est disponible
-      if (!db) {
-        console.warn('Firestore non disponible (probablement côté serveur)')
-        return []
-      }
+  // Obtenir toutes les commandes (admin)
+  const getAllOrders = async (): Promise<Order[]> => {
+    if (!db) throw new Error('Firestore non disponible')
 
+    try {
       const q = query(
         collection(db, COLLECTION_NAME),
-        orderBy('orderDate', 'desc'),
-        limit(limitCount)
+        orderBy('orderDate', 'desc')
       )
       
       const querySnapshot = await getDocs(q)
@@ -136,13 +128,14 @@ export function useOrderService() {
         const data = doc.data()
         orders.push({
           id: doc.id,
-          ...data,
-          orderDate: data.orderDate?.toDate() || new Date(),
-          items: data.items?.map((item: any) => ({
-            ...item,
-            addedAt: item.addedAt?.toDate() || new Date()
-          })) || []
-        } as Order)
+          userId: data.userId,
+          items: data.items,
+          shippingAddress: data.shippingAddress,
+          status: data.status,
+          totalItems: data.totalItems,
+          orderDate: data.orderDate.toDate(),
+          notes: data.notes
+        })
       })
       
       return orders
@@ -154,117 +147,35 @@ export function useOrderService() {
 
   // Mettre à jour le statut d'une commande
   const updateOrderStatus = async (orderId: string, status: OrderStatus): Promise<void> => {
-    try {
-      if (!db) { throw new Error('Firestore non disponible') }
-      const docRef = doc(db, COLLECTION_NAME, orderId)
-      await updateDoc(docRef, { status })
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du statut de la commande:', error)
-      throw error
-    }
-  }
+    if (!db) throw new Error('Firestore non disponible')
 
-  // Mettre à jour une commande
-  const updateOrder = async (orderId: string, updates: Partial<Order>): Promise<void> => {
     try {
-      if (!db) { throw new Error('Firestore non disponible') }
-      const docRef = doc(db, COLLECTION_NAME, orderId)
-      
-      // Préparer les données à mettre à jour
-      const updateData: any = { ...updates }
-      
-      // Convertir les dates si nécessaire
-      if (updates.items) {
-        updateData.items = updates.items.map(item => ({
-          ...item,
-          addedAt: item.addedAt
-        }))
-      }
-      
-      await updateDoc(docRef, updateData)
+      const orderRef = doc(db, COLLECTION_NAME, orderId)
+      await updateDoc(orderRef, { status })
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de la commande:', error)
+      console.error('Erreur lors de la mise à jour du statut:', error)
       throw error
     }
   }
 
   // Supprimer une commande
   const deleteOrder = async (orderId: string): Promise<void> => {
+    if (!db) throw new Error('Firestore non disponible')
+
     try {
-      if (!db) { throw new Error('Firestore non disponible') }
-      const docRef = doc(db, COLLECTION_NAME, orderId)
-      await deleteDoc(docRef)
+      const orderRef = doc(db, COLLECTION_NAME, orderId)
+      await deleteDoc(orderRef)
     } catch (error) {
       console.error('Erreur lors de la suppression de la commande:', error)
       throw error
     }
   }
 
-  // Obtenir les commandes par statut
-  const getOrdersByStatus = async (status: OrderStatus, limitCount: number = 50): Promise<Order[]> => {
-    try {
-      if (!db) { throw new Error('Firestore non disponible') }
-      const q = query(
-        collection(db, COLLECTION_NAME),
-        where('status', '==', status),
-        orderBy('orderDate', 'desc'),
-        limit(limitCount)
-      )
-      
-      const querySnapshot = await getDocs(q)
-      const orders: Order[] = []
-      
-      querySnapshot.forEach((doc) => {
-        const data = doc.data()
-        orders.push({
-          id: doc.id,
-          ...data,
-          orderDate: data.orderDate?.toDate() || new Date(),
-          items: data.items?.map((item: any) => ({
-            ...item,
-            addedAt: item.addedAt?.toDate() || new Date()
-          })) || []
-        } as Order)
-      })
-      
-      return orders
-    } catch (error) {
-      console.error('Erreur lors de la récupération des commandes par statut:', error)
-      throw error
-    }
-  }
-
-  // Obtenir les statistiques des commandes
-  const getOrderStats = async () => {
-    try {
-      const allOrders = await getAllOrders(1000) // Limite plus élevée pour les stats
-      
-      const stats = {
-        total: allOrders.length,
-        pending: allOrders.filter(order => order.status === OrderStatus.PENDING).length,
-        processing: allOrders.filter(order => order.status === OrderStatus.PROCESSING).length,
-        shipped: allOrders.filter(order => order.status === OrderStatus.SHIPPED).length,
-        delivered: allOrders.filter(order => order.status === OrderStatus.DELIVERED).length,
-        cancelled: allOrders.filter(order => order.status === OrderStatus.CANCELLED).length,
-        totalItems: allOrders.reduce((sum, order) => sum + order.totalItems, 0)
-      }
-      
-      return stats
-    } catch (error) {
-      console.error('Erreur lors du calcul des statistiques:', error)
-      throw error
-    }
-  }
-
   return {
     createOrder,
-    getOrderById,
     getUserOrders,
     getAllOrders,
     updateOrderStatus,
-    updateOrder,
-    deleteOrder,
-    getOrdersByStatus,
-    getOrderStats
+    deleteOrder
   }
 }

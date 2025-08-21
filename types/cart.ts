@@ -10,9 +10,13 @@ export interface CartItem {
 }
 
 export interface Cart {
+  id?: string;
+  cartId?: string;
+  userId?: string;
   items: CartItem[];
   totalItems: number;
   updatedAt: Date;
+  createdAt?: Date;
 }
 
 export interface ShippingAddress {

@@ -1,9 +1,13 @@
 <template>
   <div ref="cartContainer">
-    <Heading level="1" class="mb-6">Mon Panier</Heading>
-    <p class="text-sm text-gray-500 max-w-3xl mb-8">
-      Finalisez votre commande en 3 étapes simples
-    </p>
+          <div class="flex justify-between items-center mb-6">
+        <div>
+          <Heading level="1">Mon Panier</Heading>
+          <p class="text-sm text-gray-500 max-w-3xl mt-2">
+            Finalisez votre commande en 3 étapes simples
+          </p>
+        </div>
+      </div>
 
     <!-- Indicateur d'étapes -->
     <Card class="mb-6">
@@ -290,7 +294,7 @@
                 Retour
               </button>
               <button 
-                @click="nextStep"
+                @click="async () => { await saveShippingInfo(); nextStep(); }"
                 :disabled="!isShippingInfoComplete"
                 class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -430,11 +434,12 @@ const {
   removeFromCart, 
   updateQuantity, 
   clearCart,
-  createOrderFromCart
+  createOrderFromCart,
+  loadCart
 } = useCart()
 
 const { isLoggedIn, user } = useAuth()
-const { createOrder } = useOrderService()
+  const { createOrder } = useOrderService()
 
 // Référence au conteneur du panier
 const cartContainer = ref<HTMLElement>()
@@ -458,16 +463,48 @@ const shippingAddress = ref<ShippingAddress>({
 
 const orderNotes = ref('')
 
+// Sauvegarder les informations de livraison
+const saveShippingInfo = async () => {
+  if (!user.value?.uid) return
+  
+  try {
+    const storageKey = `shipping_${user.value.uid}`
+    localStorage.setItem(storageKey, JSON.stringify(shippingAddress.value))
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des informations de livraison:', error)
+  }
+}
+
+
+
+// Watcher pour sauvegarder automatiquement les informations de livraison
+watch(shippingAddress, (newValue, oldValue) => {
+  if (user.value?.uid) {
+    saveShippingInfo()
+  }
+}, { deep: true, immediate: false })
+
 // Charger les informations de l'utilisateur
 const loadUserShippingInfo = async () => {
-  if (!user.value) return
+  if (!user.value?.uid) {
+    return
+  }
   
   try {
     // Charger depuis localStorage
-    const stored = localStorage.getItem(`shipping_${user.value.uid}`)
+    const storageKey = `shipping_${user.value.uid}`
+    
+    const stored = localStorage.getItem(storageKey)
     if (stored) {
       const parsed = JSON.parse(stored)
       shippingAddress.value = { ...parsed }
+    } else {
+      // Initialiser avec des valeurs par défaut si l'utilisateur a des informations de base
+      if (user.value.displayName) {
+        const nameParts = user.value.displayName.split(' ')
+        shippingAddress.value.firstName = nameParts[0] || ''
+        shippingAddress.value.lastName = nameParts.slice(1).join(' ') || ''
+      }
     }
   } catch (error) {
     console.error('Erreur lors du chargement des informations de livraison:', error)
@@ -476,12 +513,27 @@ const loadUserShippingInfo = async () => {
 
 // Vérifier si les informations de livraison sont complètes
 const isShippingInfoComplete = computed(() => {
-  return shippingAddress.value.firstName.trim() !== '' &&
+  const isComplete = shippingAddress.value.firstName.trim() !== '' &&
          shippingAddress.value.lastName.trim() !== '' &&
          shippingAddress.value.address.trim() !== '' &&
          shippingAddress.value.city.trim() !== '' &&
          shippingAddress.value.postalCode.trim() !== '' &&
          shippingAddress.value.country.trim() !== ''
+  
+  // Log détaillé pour debug
+  if (!isComplete) {
+    console.log('⚠️ Informations de livraison incomplètes:')
+    console.log('  - Prénom:', shippingAddress.value.firstName.trim() !== '' ? '✅' : '❌')
+    console.log('  - Nom:', shippingAddress.value.lastName.trim() !== '' ? '✅' : '❌')
+    console.log('  - Adresse:', shippingAddress.value.address.trim() !== '' ? '✅' : '❌')
+    console.log('  - Ville:', shippingAddress.value.city.trim() !== '' ? '✅' : '❌')
+    console.log('  - Code postal:', shippingAddress.value.postalCode.trim() !== '' ? '✅' : '❌')
+    console.log('  - Pays:', shippingAddress.value.country.trim() !== '' ? '✅' : '❌')
+  } else {
+    console.log('✅ Informations de livraison complètes')
+  }
+  
+  return isComplete
 })
 
 // Configuration des étapes
@@ -510,17 +562,40 @@ const steps = computed((): CartStep[] => [
 ])
 
 // Navigation entre les étapes
-const nextStep = () => {
+const nextStep = async () => {
+  console.log('🔄 Tentative de passage à l\'étape suivante...')
+  console.log('👤 Utilisateur connecté:', isLoggedIn.value)
+  console.log('📦 Panier vide:', isEmpty.value)
+  
   if (currentStep.value === 1 && isEmpty.value) {
+    console.log('🚫 Bloqué: panier vide')
     return // Ne pas passer à l'étape suivante si le panier est vide
   }
   if (currentStep.value === 1 && !isLoggedIn.value) {
+    console.log('🚫 Bloqué: utilisateur non connecté')
     return // Ne pas passer à l'étape suivante si pas connecté
   }
   if (currentStep.value === 2 && !isShippingInfoComplete.value) {
+    console.log('🚫 Bloqué: informations de livraison incomplètes')
     return // Ne pas passer à l'étape suivante si les informations de livraison ne sont pas complètes
   }
+  
+  // Vérification de sécurité supplémentaire
+  if ((currentStep.value === 2 || currentStep.value === 3) && !isLoggedIn.value) {
+    console.log('🚫 Bloqué: accès non autorisé aux étapes avancées')
+    currentStep.value = 1
+    return
+  }
+  
   if (currentStep.value < 3) {
+    console.log('✅ Passage à l\'étape', currentStep.value + 1)
+    
+    // Sauvegarder les informations de livraison si on passe de l'étape 2 à l'étape 3
+    if (currentStep.value === 2 && isLoggedIn.value) {
+      console.log('💾 Sauvegarde forcée des informations de livraison avant passage à l\'étape 3')
+      await saveShippingInfo()
+    }
+    
     currentStep.value++
     // Scroll vers le haut du composant après le rendu
     nextTick(() => {
@@ -550,6 +625,24 @@ const submitOrder = async () => {
   try {
     submitting.value = true
     
+    // Vérifier que l'utilisateur est connecté
+    if (!user.value?.uid) {
+      throw new Error('Utilisateur non connecté')
+    }
+    
+    // Vérifier que le panier n'est pas vide
+    if (items.value.length === 0) {
+      throw new Error('Panier vide')
+    }
+    
+    // Vérifier que les informations de livraison sont complètes
+    if (!isShippingInfoComplete.value) {
+      throw new Error('Informations de livraison incomplètes')
+    }
+    
+    // Sauvegarder les informations de livraison avant l'envoi
+    await saveShippingInfo()
+    
     // Créer la commande
     const order = createOrderFromCart(shippingAddress.value, orderNotes.value)
     
@@ -562,7 +655,7 @@ const submitOrder = async () => {
     // Afficher la confirmation
     showConfirmation.value = true
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur lors de la création de la commande:', error)
     // TODO: Afficher un message d'erreur à l'utilisateur
   } finally {
@@ -587,13 +680,29 @@ watch(isLoggedIn, async (newValue) => {
 
 // Surveiller l'étape pour charger les informations quand on arrive à l'étape 2
 watch(currentStep, async (newStep) => {
+  // Empêcher l'accès aux étapes 2 et 3 sans connexion
+  if ((newStep === 2 || newStep === 3) && !isLoggedIn.value) {
+    currentStep.value = 1
+    return
+  }
+  
   if (newStep === 2 && isLoggedIn.value) {
     await loadUserShippingInfo()
+    // Sauvegarder les informations actuelles au cas où elles auraient été modifiées
+    await saveShippingInfo()
   }
 })
 
 // Charger les informations au montage si l'utilisateur est déjà connecté
 onMounted(async () => {
+  // Recharger le panier pour s'assurer qu'il est à jour
+  await loadCart()
+  
+  // Vérifier que l'utilisateur ne peut pas accéder aux étapes avancées sans connexion
+  if ((currentStep.value === 2 || currentStep.value === 3) && !isLoggedIn.value) {
+    currentStep.value = 1
+  }
+  
   if (isLoggedIn.value) {
     await loadUserShippingInfo()
   }
