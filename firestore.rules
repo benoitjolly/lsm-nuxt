@@ -84,8 +84,8 @@ service cloud.firestore {
       allow update: if request.auth != null && 
                      resource.data.userId == request.auth.uid;
       
-      // Les administrateurs peuvent lire et modifier toutes les commandes
-      allow read, write: if isAdmin();
+      // Les administrateurs et modérateurs peuvent lire et modifier toutes les commandes
+      allow read, write: if isAdmin() || isModerator();
     }
     
     // Par défaut, refuser tout accès aux autres collections

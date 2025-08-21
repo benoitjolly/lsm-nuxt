@@ -66,7 +66,7 @@
             </div>
             <button 
               v-else
-              @click="addToCart(serrure, 1)"
+              @click="addToCart(props.serrure, 1)"
               class="inline-flex items-center px-2 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,7 +123,7 @@ import useCart from '~/composables/useCart'
 const { isLoggedIn } = useAuth()
 const { addToCart, updateQuantity, isInCart, getQuantityInCart } = useCart()
 
-defineProps<{
+const props = defineProps<{
   serrure: Serrure
 }>()
 

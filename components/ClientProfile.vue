@@ -419,9 +419,9 @@ const saveMessage = ref<{ type: 'success' | 'error' | null, text: string }>({ ty
 
 // Vérifier l'authentification au montage
 onMounted(async () => {
-  // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
+  // Si l'utilisateur n'est pas connecté, rediriger vers la page d'accueil
   if (!isLoggedIn.value) {
-    router.push('/login')
+    router.push('/')
     return
   }
   
@@ -537,7 +537,7 @@ const handleLogout = async () => {
   const success = await logout()
   if (success) {
     emit('logout')
-    router.push('/login')
+    router.push('/')
   }
 }
 
