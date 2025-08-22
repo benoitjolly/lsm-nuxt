@@ -21,6 +21,7 @@ export { default as Alert } from './Alert.vue'
 export { default as Tabs } from './Tabs.vue'
 export { default as ThemeToggle } from './ThemeToggle.vue'
 export { default as CartAnimation } from './CartAnimation.vue'
+export { default as Tooltip } from './Tooltip.vue'
 
 // Export par défaut pour faciliter l'import
 export default {
@@ -42,4 +43,5 @@ export default {
   Tabs: () => import('./Tabs.vue'),
   ThemeToggle: () => import('./ThemeToggle.vue'),
   CartAnimation: () => import('./CartAnimation.vue'),
+  Tooltip: () => import('./Tooltip.vue'),
 } 
