@@ -2,13 +2,11 @@
   <div>
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-4">Serrures de haute qualité</h1>
+        <h1 class="text-2xl font-bold text-h1 mb-4">Serrures de haute qualité</h1>
         <p class="text-sm text-gray-500 max-w-3xl">
           Découvrez notre gamme complète de serrures professionnelles. Sécurité, fiabilité et innovation au service de vos besoins.
         </p>
       </div>
-      
-
     </div>
     
     <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
@@ -38,7 +36,7 @@
           <!-- Affichage par type de serrure -->
           <div v-for="typeWithSerrures in typesAvecSerrures" :key="typeWithSerrures.id" class="mb-12 last:mb-0">
             <div class="flex justify-between items-center mb-6">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">{{ typeWithSerrures.nom }}</h3>
+              <h3 class="text-lg leading-6 font-medium text-h3">{{ typeWithSerrures.nom }}</h3>
               <NuxtLink :to="`/type/${typeWithSerrures.id}`" class="text-indigo-600 hover:text-indigo-900 flex items-center" :aria-label="`Voir toutes les serrures de type ${typeWithSerrures.nom}`">
                 Voir tout
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -58,7 +56,7 @@
                           v-if="serrure.photoUrl"
                           :src="serrure.photoUrl"
                           :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle || 'Sans nom'}`"
-                          class="w-full h-full object-cover"
+                          class="w-full h-full object-contain"
                           loading="lazy"
                         />
                         <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">
@@ -108,7 +106,7 @@
           
           <!-- Section pour les serrures sans type assigné -->
           <div v-if="serruresSansType.length > 0" class="mt-8">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-6">Autres serrures</h3>
+            <h3 class="text-lg leading-6 font-medium text-h3 mb-6">Autres serrures</h3>
             
             <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
               <div v-for="serrure in serruresSansType" :key="serrure.id" class="group relative">
@@ -119,7 +117,7 @@
                         v-if="serrure.photoUrl"
                         :src="serrure.photoUrl"
                         :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle || 'Sans nom'}`"
-                        class="w-full h-full object-center object-cover"
+                        class="w-full h-full object-center object-contain"
                         loading="lazy"
                       />
                       <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">

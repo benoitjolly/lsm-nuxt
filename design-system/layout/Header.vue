@@ -4,7 +4,9 @@
     <div class="logo-container">
       <NuxtLink to="/" class="logo-link">
         <div class="logo-wrapper">
-          <img src="~/assets/images/logo.png" alt="LSM Logo" class="logo-image" />
+          <ClientOnly>
+            <img src="~/assets/images/logo.png" alt="LSM Logo" class="logo-image" />
+          </ClientOnly>
         </div>
       </NuxtLink>
     </div>
@@ -64,17 +66,19 @@
     <!-- Menu utilisateur -->
     <div class="user-menu">
       <!-- Profil utilisateur -->
-      <Tooltip :text="isLoggedIn ? 'Profil utilisateur' : 'Se connecter'" position="right">
-        <NuxtLink 
-          :to="isLoggedIn ? '/profile' : '/login'" 
-          class="nav-link" 
-          :class="{ 'nav-link-active': $route.path === '/profile' || $route.path === '/login' }"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="nav-icon">
-            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437.695z" clip-rule="evenodd" />
-          </svg>
-        </NuxtLink>
-      </Tooltip>
+      <ClientOnly>
+        <Tooltip :text="isLoggedIn ? 'Profil utilisateur' : 'Se connecter'" position="right">
+          <NuxtLink 
+            :to="isLoggedIn ? '/profile' : '/login'" 
+            class="nav-link" 
+            :class="{ 'nav-link-active': $route.path === '/profile' || $route.path === '/login' }"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="nav-icon">
+              <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437.695z" clip-rule="evenodd" />
+            </svg>
+          </NuxtLink>
+        </Tooltip>
+      </ClientOnly>
       
       <!-- Administration (visible pour les administrateurs) -->
       <ClientOnly>

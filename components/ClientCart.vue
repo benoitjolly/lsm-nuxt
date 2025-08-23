@@ -61,7 +61,7 @@
           </div>
 
           <div v-else>
-            <h2 class="text-lg font-medium text-gray-900 mb-6">Articles sélectionnés ({{ itemCount }})</h2>
+            <h2 class="text-lg font-medium text-h2 mb-6">Articles sélectionnés ({{ itemCount }})</h2>
             
             <div class="space-y-4">
               <div 
@@ -74,7 +74,7 @@
                     v-if="item.photoUrl" 
                     :src="item.photoUrl" 
                     :alt="item.designation || item.codeArticle"
-                    class="h-16 w-16 object-cover rounded-md"
+                    class="h-16 w-16 object-contain rounded-md bg-gray-50"
                   />
                   <div v-else class="h-16 w-16 bg-gray-200 rounded-md flex items-center justify-center">
                     <svg class="h-8 w-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -306,7 +306,7 @@
 
         <!-- Étape 3: Résumé de la commande -->
         <div v-else-if="currentStep === 3" class="px-4 py-5 sm:p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-6">Résumé de la commande</h2>
+          <h2 class="text-lg font-medium text-h2 mb-6">Résumé de la commande</h2>
           
           <div class="space-y-6">
             <!-- Récapitulatif des articles -->

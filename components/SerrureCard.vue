@@ -6,7 +6,7 @@
           <img 
             :src="serrure.photoUrl" 
             alt="Photo de la serrure" 
-            class="h-24 w-24 object-cover rounded-md"
+            class="h-24 w-24 object-contain rounded-md bg-gray-50"
           />
         </div>
         <div v-else class="p-2 bg-indigo-100 rounded-md mr-4 flex-shrink-0">

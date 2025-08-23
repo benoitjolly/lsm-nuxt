@@ -19,7 +19,6 @@ export { default as Avatar } from './Avatar.vue'
 export { default as Modal } from './Modal.vue'
 export { default as Alert } from './Alert.vue'
 export { default as Tabs } from './Tabs.vue'
-export { default as ThemeToggle } from './ThemeToggle.vue'
 export { default as CartAnimation } from './CartAnimation.vue'
 export { default as Tooltip } from './Tooltip.vue'
 
@@ -41,7 +40,6 @@ export default {
   Modal: () => import('./Modal.vue'),
   Alert: () => import('./Alert.vue'),
   Tabs: () => import('./Tabs.vue'),
-  ThemeToggle: () => import('./ThemeToggle.vue'),
   CartAnimation: () => import('./CartAnimation.vue'),
   Tooltip: () => import('./Tooltip.vue'),
 } 

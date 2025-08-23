@@ -13,7 +13,7 @@
       </button>
     </div>
     
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">
+    <h1 class="text-2xl font-bold text-h1 mb-6">
       {{ serrure?.designation || 'Détails de la serrure' }}
     </h1>
     
@@ -82,7 +82,7 @@
             <img 
               :src="serrure.photoUrl" 
               :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle}`" 
-              class="h-64 object-cover rounded-md mx-auto"
+              class="h-64 object-contain rounded-md mx-auto bg-gray-50"
               loading="lazy"
               itemprop="image"
             />
@@ -97,7 +97,7 @@
                 v-if="!imageLoadError"
                 :src="serrure.planUrl" 
                 :alt="`Plan technique de la serrure ${serrure.designation || serrure.codeArticle}`" 
-                class="h-64 object-cover rounded-md mx-auto cursor-pointer"
+                class="h-64 object-contain rounded-md mx-auto cursor-pointer bg-gray-50"
                 loading="lazy"
                 @error="handleImageError"
                 @click="openPlan"

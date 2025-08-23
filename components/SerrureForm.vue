@@ -93,7 +93,7 @@
               <img 
                 :src="photoPreview || serrure.photoUrl" 
                 alt="Aperçu de la photo" 
-                class="h-32 w-32 object-cover rounded-md"
+                class="h-32 w-32 object-contain rounded-md bg-gray-50"
               />
             </div>
             <input 
@@ -115,7 +115,7 @@
                 v-if="!isPlanPdf" 
                 :src="planPreview || serrure.planUrl" 
                 alt="Aperçu du plan" 
-                class="h-32 w-32 object-cover rounded-md"
+                class="h-32 w-32 object-contain rounded-md bg-gray-50"
                 @error="handlePlanImageError"
               />
               <div v-else class="h-32 w-32 bg-gray-100 rounded-md flex flex-col items-center justify-center p-2">
@@ -181,7 +181,7 @@
                 v-if="!isAutreFilePdf" 
                 :src="autreFilePreview || serrure.autreFileUrl" 
                 alt="Aperçu du fichier" 
-                class="h-32 w-32 object-cover rounded-md"
+                class="h-32 w-32 object-contain rounded-md bg-gray-50"
                 @error="handleAutreFileImageError"
               />
               <div v-else class="h-32 w-32 bg-gray-100 rounded-md flex flex-col items-center justify-center p-2">

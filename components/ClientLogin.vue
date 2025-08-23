@@ -8,7 +8,7 @@
             <img 
               src="~/assets/images/logo.png" 
               alt="LSM Logo" 
-              class="w-16 h-16 rounded-xl bg-white shadow-md p-2 cursor-pointer hover:shadow-lg transition-shadow"
+              class="w-32 h-32 rounded-xl bg-white shadow-md p-2 cursor-pointer hover:shadow-lg transition-shadow"
             />
           </NuxtLink>
         </div>
