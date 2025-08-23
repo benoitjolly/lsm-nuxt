@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-100 flex flex-col">
+  <div class="min-h-screen bg-gray-100">
     <!-- Header from Design System -->
     <Header />
 
@@ -24,8 +24,8 @@
     </div>
 
     <!-- Main Content -->
-    <div class="pt-0 sm:pt-0 sm:ml-24 bg-gray-100 flex-1 flex flex-col overflow-x-hidden">
-      <main class="py-6 px-2 sm:px-4 lg:px-6 flex-1 bg-white rounded-xl mx-2 sm:mx-4 my-2 shadow-md overflow-x-hidden">
+    <div class="pt-0 sm:pt-0 sm:ml-24 bg-gray-100">
+      <main class="py-6 px-2 sm:px-4 lg:px-6 bg-white rounded-xl mx-2 sm:mx-4 my-4 shadow-md">
         <slot />
       </main>
       
@@ -48,14 +48,10 @@ import HomeEncart from '~/components/HomeEncart.vue'
 <style>
 html, body {
   background-color: #f3f4f6; /* bg-gray-100 */
-  min-height: 100%;
-  height: 100%;
   overflow-x: hidden; /* Empêche le scroll horizontal global */
 }
 
 #__nuxt {
-  height: 100%;
-  min-height: 100vh;
   background-color: #f3f4f6; /* bg-gray-100 */
   overflow-x: hidden; /* Empêche le scroll horizontal global */
 }
