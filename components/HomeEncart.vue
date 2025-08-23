@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-6 mb-4">
+  <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-6">
     <div class="flex flex-col lg:flex-row items-center justify-between">
       <!-- Contenu principal -->
       <div class="flex-1 mb-4 lg:mb-0 lg:mr-6">
