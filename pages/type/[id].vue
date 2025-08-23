@@ -39,7 +39,7 @@
     
     <div v-else>
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ typeSerrure.nom }}</h1>
+        <h1 class="text-2xl font-bold text-h1 mb-4">{{ typeSerrure.nom }}</h1>
         <p v-if="typeSerrure.description" class="text-sm text-gray-500 max-w-3xl">
           {{ typeSerrure.description }}
         </p>
@@ -57,7 +57,7 @@
                       v-if="serrure.photoUrl"
                       :src="serrure.photoUrl"
                       :alt="`Photo de la serrure ${serrure.designation || serrure.codeArticle || 'Sans nom'}`"
-                      class="w-full h-full object-center object-cover"
+                      class="w-full h-full object-center object-contain"
                       loading="lazy"
                     />
                     <div v-else class="w-full h-full flex items-center justify-center bg-indigo-50">

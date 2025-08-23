@@ -1,13 +1,26 @@
+/* Design System avec support des thèmes */
+@import url('../../design-system/theme.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Design System avec support des thèmes */
-@import url('../design-system/theme.css');
 
 /* Custom styles */
 @layer base {
   body {
     @apply antialiased;
+  }
+  
+  Couleurs des titres
+  h1 {
+    color: #312e81 !important;
+  }
+  
+  h2 {
+    color: #4338ca !important;
+  }
+  
+  h3 {
+    color: #4338ca !important;
   }
 } 

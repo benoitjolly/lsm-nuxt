@@ -1,9 +1,7 @@
 /**
  * Design System - CSS Variables et Thèmes
- * Import automatique de toutes les variables CSS et support des thèmes
+ * Support du thème light uniquement
  */
-
-@import url('./css-variables.css');
 
 /**
  * Configuration de base pour le body et html
@@ -68,42 +66,7 @@ body {
   background: var(--theme-border-tertiary);
 }
 
-/**
- * Mode dark automatique pour les préférences système
- */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    color-scheme: dark;
-  }
-}
 
-[data-theme="light"] {
-  color-scheme: light;
-}
-
-[data-theme="dark"] {
-  color-scheme: dark;
-}
-
-/**
- * Améliorations pour les images en mode dark
- */
-[data-theme="dark"] img:not([data-theme-ignore]) {
-  filter: brightness(0.9);
-}
-
-/**
- * Classes utilitaires pour forcer un thème spécifique
- */
-.theme-light {
-  color: var(--color-gray-900) !important;
-  background-color: var(--color-base-white) !important;
-}
-
-.theme-dark {
-  color: var(--color-gray-100) !important;
-  background-color: var(--color-gray-900) !important;
-}
 
 /**
  * Variables CSS supplémentaires pour les composants
