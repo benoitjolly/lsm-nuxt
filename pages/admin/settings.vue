@@ -50,6 +50,42 @@
                 </p>
               </div>
 
+              <!-- Filtre par statut -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex flex-wrap items-center gap-4">
+                  <label class="text-sm font-medium text-gray-700">Filtrer par statut :</label>
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      @click="selectedStatusFilter = null"
+                      :class="[
+                        'px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-150',
+                        selectedStatusFilter === null
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ]"
+                    >
+                      Tous
+                    </button>
+                    <button
+                      v-for="status in availableStatuses"
+                      :key="status.value"
+                      @click="selectedStatusFilter = status.value"
+                      :class="[
+                        'px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-150',
+                        selectedStatusFilter === status.value
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ]"
+                    >
+                      {{ status.label }}
+                    </button>
+                  </div>
+                  <div class="ml-auto text-sm text-gray-500">
+                    {{ filteredOrders.length }} commande{{ filteredOrders.length > 1 ? 's' : '' }}
+                  </div>
+                </div>
+              </div>
+
               <!-- Loading state -->
               <div v-if="loadingOrders" class="text-center py-12">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
@@ -57,17 +93,21 @@
               </div>
 
               <!-- Empty state -->
-              <div v-else-if="orders.length === 0" class="text-center py-12">
+              <div v-else-if="filteredOrders.length === 0" class="text-center py-12">
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune commande</h3>
-                <p class="mt-1 text-sm text-gray-500">Aucune commande n'a été effectuée pour le moment.</p>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">
+                  {{ selectedStatusFilter ? `Aucune commande ${getStatusLabel(selectedStatusFilter).toLowerCase()}` : 'Aucune commande' }}
+                </h3>
+                <p class="mt-1 text-sm text-gray-500">
+                  {{ selectedStatusFilter ? `Aucune commande avec le statut "${getStatusLabel(selectedStatusFilter)}"` : 'Aucune commande n\'a été effectuée pour le moment.' }}
+                </p>
               </div>
 
               <!-- Orders list -->
               <div v-else class="space-y-4">
-                <div v-for="order in orders" :key="order.id" class="bg-white border border-gray-200 rounded-lg p-6">
+                <div v-for="order in filteredOrders" :key="order.id" class="bg-white border border-gray-200 rounded-lg p-6">
                   <div class="flex items-center justify-between mb-4">
                     <div>
                       <h4 class="text-lg font-medium text-gray-900">
@@ -343,6 +383,7 @@ const orders = ref<Order[]>([])
 const loadingOrders = ref(true)
 const openStatusDropdown = ref<string | null>(null)
 const updatingOrderStatus = ref<string | null>(null)
+const selectedStatusFilter = ref<string | null>(null)
 
 // Statuts disponibles pour les commandes
 const availableStatuses = [
@@ -352,6 +393,14 @@ const availableStatuses = [
   { value: 'delivered', label: 'Livrée' },
   { value: 'cancelled', label: 'Annulée' }
 ]
+
+// Commandes filtrées par statut
+const filteredOrders = computed(() => {
+  if (!selectedStatusFilter.value) {
+    return orders.value
+  }
+  return orders.value.filter(order => order.status === selectedStatusFilter.value)
+})
 
 // Watcher pour synchroniser l'onglet actif avec l'URL
 watch(activeTab, (newTab) => {
